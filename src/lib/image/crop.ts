@@ -28,10 +28,10 @@ export function getCropSize(imgWidth: number, imgHeight: number, aspect: number)
  * @returns
  */
 export function restrictPosition(
-	position: Point,
-	imageSize: Size,
-	cropSize: Size,
-	zoom: number
+	position: Readonly<Point>,
+	imageSize: Readonly<Size>,
+	cropSize: Readonly<Size>,
+	zoom: Readonly<number>
 ): Point {
 	return {
 		x: restrictPositionCoord(position.x, imageSize.width, cropSize.width, zoom),
@@ -40,10 +40,10 @@ export function restrictPosition(
 }
 
 function restrictPositionCoord(
-	position: number,
-	imageSize: number,
-	cropSize: number,
-	zoom: number
+	position: Readonly<number>,
+	imageSize: Readonly<number>,
+	cropSize: Readonly<number>,
+	zoom: Readonly<number>
 ) {
 	// Default max position calculation
 	let maxPosition = (imageSize * zoom) / 2 - cropSize / 2;
@@ -237,9 +237,12 @@ export async function getCroppedImg(
 	// return canvas.toDataURL('image/jpeg');
 
 	// As a blob
-	return new Promise((resolve, reject) => {
+	return new Promise<Blob>((resolve, reject) => {
 		canvas.toBlob((file) => {
-			resolve(file);
+			if (!file) {
+				return reject();
+			}
+			return resolve(file);
 			// resolve(URL.createObjectURL(file));
 		}, 'image/png'); // PNG to preserve transparency
 	});

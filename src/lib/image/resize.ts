@@ -2,7 +2,7 @@
  * Resize an image to fit within the specified dimensions.
  */
 export function resizeImage(
-	file: File,
+	file: Blob,
 	maxWidth: number,
 	maxHeight: number,
 	quality: number,

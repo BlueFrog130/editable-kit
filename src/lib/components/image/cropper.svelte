@@ -1,13 +1,13 @@
 <script lang="ts">
-	import { onDestroy, onMount } from 'svelte';
+	import { onDestroy, onMount, untrack } from 'svelte';
 	import * as helpers from '$lib/image/index.js';
 	import type { ImageSize, Point, Size } from '$lib/image/types.js';
 	import type { CropperProps } from './index.js';
 
 	let {
 		image,
-		crop = { x: 0, y: 0 },
-		zoom = 1,
+		crop = $bindable({ x: 0, y: 0 }),
+		zoom = $bindable(1),
 		aspect = 4 / 3,
 		minZoom = 1,
 		maxZoom = 3,
@@ -244,31 +244,10 @@
 		el.addEventListener('touchstart', onTouchStart, { passive: false });
 		el.addEventListener('wheel', onWheel, { passive: false });
 	}
-
-	// ------ Reactive statement ------
-	//when aspect changes, we reset the cropperSize
-	$effect(() => {
-		if (imgEl) {
-			cropperSize = cropSize ? cropSize : helpers.getCropSize(imgEl.width, imgEl.height, aspect);
-		}
-	});
-
-	// when zoom changes, we recompute the cropped area
-	$effect(() => {
-		if (zoom) {
-			emitCropData();
-		}
-	});
-
-	$effect(() => {
-		if (aspect) {
-			computeSizes();
-			emitCropData();
-		}
-	});
 </script>
 
 <svelte:window on:resize={computeSizes} />
+
 <div
 	class="svelte-easy-crop-container"
 	bind:this={containerEl}

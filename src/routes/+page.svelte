@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { EditorToolbar } from '$lib/components/editor-toolbar/index.js';
+	import { Image } from '$lib/components/image/index.js';
 	import { PlainText } from '$lib/components/plain-text/index.js';
 	import { RichText } from '$lib/components/rich-text/index.js';
 	import { editor } from '$lib/index.js';
@@ -10,6 +11,8 @@
 
 	let richContent = $state('Page content 3');
 	let richMultilineContent = $state('Page content 4');
+
+	let src = $state('');
 
 	onMount(() => {
 		editor.isEditing = true;
@@ -36,5 +39,9 @@
 	</div>
 	<div>
 		<RichText bind:content={richMultilineContent} multiline />
+	</div>
+
+	<div class="w-14 h-14">
+		<Image maxWidth={160} maxHeight={160} quality={0.8} bind:src alt="tester" />
 	</div>
 </div>

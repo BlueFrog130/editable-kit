@@ -1,8 +1,6 @@
 <script lang="ts">
 	import type { ImageProps } from './index.js';
 	import { editor } from '$lib/state/index.js';
-	import { svelte } from '@sveltejs/vite-plugin-svelte';
-	import ImageEditor from './image-editor.svelte';
 
 	let { src = $bindable(), alt, maxHeight, maxWidth, ...props }: ImageProps = $props();
 

@@ -34,6 +34,7 @@
 		"@sveltejs/vite-plugin-svelte": "^3.0.0",
 		"@unocss/extractor-svelte": "^0.61.0",
 		"lucide-svelte": "^0.399.0",
+		"nanoid": "^5.0.7",
 		"prettier": "^3.1.1",
 		"prettier-plugin-svelte": "^3.1.2",
 		"prosemirror-commands": "^1.5.2",
@@ -59,6 +60,7 @@
 	"type": "module",
 	"dependencies": {
 		"@unocss/reset": "^0.61.0",
+		"cropperjs": "^1.6.2",
 		"unocss": "^0.61.0"
 	}
 }
