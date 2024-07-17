@@ -11,6 +11,7 @@
 	import { EditorView } from 'prosemirror-view';
 	import { untrack } from 'svelte';
 	import { buildInputRules } from '$lib/editor/input-rules.js';
+	import { textToolbar } from '$lib/editor/toolbars.js';
 
 	let { content = $bindable(), multiline }: RichTextEditorProps = $props();
 
@@ -28,6 +29,7 @@
 				update(view) {
 					editor.view = view;
 					editor.state = view.state;
+					editor.tools = textToolbar({ view, state: view.state });
 				}
 			};
 		}

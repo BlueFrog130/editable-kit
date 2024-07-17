@@ -1,37 +1,35 @@
 <script lang="ts">
 	import { setBlockType } from 'prosemirror-commands';
-	import { editor, type ChildrenProps } from '$lib/index.js';
 	import { blockTypeActive } from '$lib/editor/util.js';
+	import Heading from 'lucide-svelte/icons/heading';
+	import type { EditorToolProps } from './index.js';
 
-	const { children }: ChildrenProps = $props();
+	const { state, view }: EditorToolProps = $props();
 
 	const disabled = $derived.by(() => {
-		if (!editor.state?.schema) return true;
+		if (!state?.schema) return true;
 		return (
-			!setBlockType(editor.state.schema.nodes.heading)(editor.state) &&
-			!setBlockType(editor.state.schema.nodes.paragraph)(editor.state)
+			!setBlockType(state.schema.nodes.heading)(state) &&
+			!setBlockType(state.schema.nodes.paragraph)(state)
 		);
 	});
 
 	const active = $derived.by(() => {
-		if (!editor.state?.schema) return false;
-		return blockTypeActive(editor.state.schema.nodes.heading, { level: 1 })(editor.state);
+		if (!state?.schema) return false;
+		return blockTypeActive(state.schema.nodes.heading, { level: 1 })(state);
 	});
 
 	function handleClick(event: MouseEvent & { currentTarget: EventTarget & HTMLButtonElement }) {
-		if (!editor.state?.schema) return;
+		if (!state?.schema) return;
 		if (active) {
-			setBlockType(editor.state.schema.nodes.paragraph)(editor.state, editor.view?.dispatch);
+			setBlockType(state.schema.nodes.paragraph)(state, view?.dispatch);
 		} else {
-			setBlockType(editor.state.schema.nodes.heading, { level: 1 })(
-				editor.state,
-				editor.view?.dispatch
-			);
+			setBlockType(state.schema.nodes.heading, { level: 1 })(state, view?.dispatch);
 		}
-		editor.view?.focus();
+		view?.focus();
 	}
 </script>
 
 <button onclick={handleClick} {disabled} class="sm:mx-1 rounded-full p-2 disabled:opacity-30">
-	{@render children()}
+	<Heading class="h-3 w-3 sm:h-4 sm:w-4" />
 </button>

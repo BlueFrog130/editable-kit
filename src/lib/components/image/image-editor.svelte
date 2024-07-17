@@ -1,163 +1,96 @@
 <script lang="ts">
-	import type { ImageProps } from './index.js';
-	import { isSafari, nanoid } from '$lib/util.js';
-	import { getCroppedImg } from '$lib/image/crop.js';
-	import type { CropArea } from '$lib/image/types.js';
-	import { resizeImage } from '$lib/image/resize.js';
-	import { getDimensions } from '$lib/image/index.js';
+	import { tool } from '$lib/editor/toolbars.js';
+	import { editor } from '$lib/state/index.svelte.js';
+	import type { Action } from 'svelte/action';
+	import CropButton from './crop-button.svelte';
+	import ReplaceButton from './replace-button.svelte';
 	import Cropper from './cropper.svelte';
+	import type CropperType from 'cropperjs';
+	import { customAlphabet } from 'nanoid';
+	import { untrack } from 'svelte';
 
 	let {
 		src = $bindable(),
-		previewSrc = $bindable(),
-		alt,
-		quality,
-		maxHeight,
-		maxWidth,
-		uploadPrompt
-	}: ImageProps & { previewSrc: string } = $props();
+		previewSrc = $bindable()
+	}: { src: string; previewSrc: string | undefined } = $props();
 
-	let fileInput: HTMLInputElement;
-	let progress: number | undefined = undefined;
-	let overlayEl: HTMLElement;
+	let editing = $state(false);
+	let cropData: CropperType.Data | undefined = $state();
+	let cropper: CropperType | undefined = $state();
+	let el: HTMLButtonElement;
 
-	let newSrc: string | undefined = $state(undefined);
-	let cropDetail: CropArea | undefined = undefined;
-	let isCropping = $state(false);
-	let scale = $state(1);
-	let crop = $state({
-		x: 0,
-		y: 0
-	});
-	let zoom = $state(1);
+	const alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+	const nanoid = customAlphabet(alphabet, 10);
+	let id = nanoid();
 
-	let safari = isSafari();
-
-	function onKeyDown(e: KeyboardEvent) {
-		if (isCropping && e.key === 'Escape') {
-			cancelCropping();
-		} else if (isCropping && e.key === 'Enter') {
-			uploadImage();
-		}
-	}
-
-	function cancelCropping() {
-		isCropping = false;
-		newSrc = undefined;
-		if (fileInput) fileInput.value = '';
-		scale = 1;
-	}
-
-	async function uploadImage() {
-		if (!newSrc || !cropDetail) return;
-		const file = fileInput.files?.[0];
-		const contentType = isSafari() ? 'image/jpeg' : 'image/webp';
-
-		const extension = contentType === 'image/jpeg' ? 'jpg' : 'webp';
-
-		const path = `images/${nanoid()}.${extension}`;
-		const croppedImage = await getCroppedImg(newSrc, cropDetail);
-
-		if (!croppedImage) return;
-
-		const resizedBlob = await resizeImage(croppedImage, maxWidth, maxHeight, quality, contentType);
-		const resizedFile = new File([resizedBlob], `${file?.name.split('.')[0]}`, {
-			type: contentType
-		});
-
-		progress = 0;
-		try {
-			// TODO: implement current user
-			src = URL.createObjectURL(resizedFile);
-			progress = undefined;
-		} catch (e) {
-			console.error(e);
-			progress = undefined;
-		}
-		cancelCropping();
-		fileInput.value = '';
-	}
-
-	async function startCropping() {
-		const file = fileInput.files?.[0];
+	function insertFile(event: Event & { currentTarget: EventTarget & HTMLInputElement }) {
+		const file = event.currentTarget.files?.[0];
 		if (!file) return;
-		const { width, height } = await getDimensions(file);
-		const currentAspectRatio = width / height;
-		const desiredAspectRatio = maxWidth / maxHeight;
 
-		if (desiredAspectRatio > currentAspectRatio) {
-			scale = desiredAspectRatio / currentAspectRatio;
-		} else {
-			scale = currentAspectRatio / desiredAspectRatio;
-		}
-
-		newSrc = URL.createObjectURL(file);
-		isCropping = true;
+		const reader = new FileReader();
+		reader.onload = () => {
+			src = reader.result as string;
+		};
+		reader.readAsDataURL(file);
+		el.focus();
 	}
+
+	function onFocus() {
+		editing = true;
+		editor.tools = [
+			tool(CropButton, { onclick: () => {} }),
+			tool(ReplaceButton, { onclick: replaceImage })
+		];
+	}
+
+	async function outFocus() {
+		editing = false;
+	}
+
+	function replaceImage() {
+		const input = document.createElement('input');
+		input.type = 'file';
+		input.accept = 'image/*';
+		input.onchange = (e) => {
+			insertFile({ ...e, currentTarget: input });
+			input.remove();
+		};
+		input.click();
+	}
+
+	$effect(() => {
+		// TODO: Remove this stuff - probably don't need to emit preview src back up to parent
+		return () => {
+			const c = untrack(() => cropper);
+			console.log('unmounting and setting previewSrc', c);
+			if (!c) return;
+			const canvas = c.getCroppedCanvas();
+			console.log('canvas', canvas);
+			previewSrc = canvas.toDataURL();
+		};
+	});
 </script>
 
-<div
-	bind:this={overlayEl}
-	role="none"
-	class={isCropping
-		? 'z-40 bg-black text-white font-bold fixed inset-0 bg-opacity-80 text-center p-6'
-		: 'hidden'}
-	ondblclick={cancelCropping}
+<button
+	bind:this={el}
+	{id}
+	class="w-full h-full [&.editing]:ring-1 hover:ring-1 ring-[#39f] group relative"
+	class:editing
+	onfocusin={onFocus}
+	onclick={onFocus}
+	onfocusout={outFocus}
 >
-	{#if safari}
-		<span class="text-[#EF174C]">ATTENTION:</span> Use Google Chrome, Firefox, oder Microsoft Edge for
-		optimized image quality and size.
+	{#if src}
+		<div class="invisible group-[.editing]:visible w-full h-full">
+			<Cropper bind:cropper {id} {src} bind:data={cropData} aspectRatio={1 / 1} />
+		</div>
+		<div
+			class="absolute top-0 left-0 preview visible group-[.editing]:invisible overflow-hidden w-full h-full object-cover"
+		></div>
 	{:else}
-		Confirm with ENTER. Cancel with ESC.
+		<label class="grid place-content-center w-full h-full bg-gray cursor-pointer">
+			<input class="sr-only" type="file" accept="image/*" onchange={insertFile} />
+			<p>Image</p>
+		</label>
 	{/if}
-</div>
-
-{#if isCropping}
-	<div class="flex space-x-4 z-[60] fixed bottom-0 right-0 left-0 p-6">
-		<div class="flex-1"></div>
-		<button class="bg-[#EF174C] text-white rounded-full px-4 py-2" onclick={uploadImage}
-			>Confirm</button
-		>
-		<button class="bg-white text-black rounded-full px-4 py-2" onclick={cancelCropping}
-			>Cancel</button
-		>
-		<div class="flex-1"></div>
-	</div>
-{/if}
-
-<div
-	role="img"
-	style={`aspect-ratio: ${maxWidth}/${maxHeight}; scale: ${scale}`}
-	class={isCropping ? `relative z-50` : 'relative'}
-	ondblclick={uploadImage}
->
-	{#if isCropping}
-		<Cropper
-			image={newSrc}
-			bind:crop
-			bind:zoom
-			oncropcomplete={(d) => (cropDetail = d.pixels)}
-			aspect={maxWidth / maxHeight}
-		/>
-	{:else}
-		<button onclick={() => fileInput.click()}>
-			<img
-				class={'cursor-pointer outline-[2px] hover:outline-dashed outline-[#EF174C] -outline-offset-[2px]'}
-				{src}
-				{alt}
-				title={uploadPrompt}
-			/>
-		</button>
-	{/if}
-</div>
-
-<input
-	class="w-px h-px opacity-0 fixed -top-40"
-	type="file"
-	accept="image/*"
-	name="imagefile"
-	bind:this={fileInput}
-	onchange={startCropping}
-/>
-
-<svelte:window on:keydown={onKeyDown} />
+</button>

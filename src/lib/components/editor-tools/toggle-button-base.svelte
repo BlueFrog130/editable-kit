@@ -1,18 +1,20 @@
 <script lang="ts">
 	import { wrapIn } from 'prosemirror-commands';
-	import { editor, type ChildrenProps } from '$lib/index.js';
+	import type { ChildrenProps } from '$lib/index.js';
+	import type { EditorToolProps } from './index.js';
 
-	const { children, node }: ChildrenProps & { node: string } = $props();
+	const { children, node, view, state }: ChildrenProps & { node: string } & EditorToolProps =
+		$props();
 
 	const disabled = $derived.by(() => {
-		if (!editor.state?.schema) return true;
-		return !wrapIn(editor.state.schema.nodes[node])(editor.state);
+		if (!state.schema) return true;
+		return !wrapIn(state.schema.nodes[node])(state);
 	});
 
 	function handleClick(event: MouseEvent & { currentTarget: EventTarget & HTMLButtonElement }) {
-		if (!editor.state?.schema) return;
-		wrapIn(editor.state.schema.nodes[node])(editor.state, editor.view?.dispatch);
-		editor.view?.focus();
+		if (!state?.schema) return;
+		wrapIn(state.schema.nodes[node])(state, view?.dispatch);
+		view?.focus();
 	}
 </script>
 

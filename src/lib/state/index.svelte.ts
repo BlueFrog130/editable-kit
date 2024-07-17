@@ -1,12 +1,16 @@
 import type { EditorState } from 'prosemirror-state';
 import type { ChangeFunction } from './index.js';
 import { EditorView } from 'prosemirror-view';
+import type { Component, Snippet, SvelteComponent } from 'svelte';
+import type { Tool } from '$lib/editor/toolbars.js';
 
 class GlobalEditorState {
 	isEditing = $state(false);
 
 	view = $state<EditorView | null>(null);
 	state = $state<EditorState | null>(null);
+
+	tools = $state.frozen<Tool<Component<any>>[]>([]);
 
 	#changes = $state<ChangeFunction[]>([]);
 

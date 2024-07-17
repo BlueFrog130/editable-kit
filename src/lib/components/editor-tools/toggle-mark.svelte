@@ -1,30 +1,39 @@
 <script lang="ts">
 	import { toggleMark } from 'prosemirror-commands';
-	import { editor, type ChildrenProps } from '$lib/index.js';
+	import { type ChildrenProps } from '$lib/index.js';
 	import { markActive } from '$lib/editor/util.js';
 	import type { EditorState } from 'prosemirror-state';
+	import type { EditorView } from 'prosemirror-view';
+	import type { EditorToolProps } from './index.js';
 
-	const { children, type }: ChildrenProps & { type: keyof EditorState['schema']['marks'] } =
-		$props();
+	const {
+		children,
+		type,
+		view,
+		state
+	}: ChildrenProps &
+		EditorToolProps & {
+			type: keyof EditorState['schema']['marks'];
+		} = $props();
 
-	const markType = $derived(editor.state?.schema.marks[type]);
+	const markType = $derived(state?.schema.marks[type]);
 
 	const command = $derived(markType ? toggleMark(markType) : undefined);
 
 	const active = $derived.by(() => {
-		if (!editor.state?.schema || !markType) return false;
-		return markActive(markType)(editor.state);
+		if (!state?.schema || !markType) return false;
+		return markActive(markType)(state);
 	});
 
 	const disabled = $derived.by(() => {
-		if (!editor.view?.state.schema || !command) return true;
-		return !markType || !command(editor.view.state);
+		if (!view?.state.schema || !command) return true;
+		return !markType || !command(view.state);
 	});
 
 	function handleClick(event: MouseEvent & { currentTarget: EventTarget & HTMLButtonElement }) {
-		if (!command || !editor.view?.state || !editor.state) return;
-		command(editor.state, editor.view.dispatch, editor.view);
-		editor.view.focus();
+		if (!command || !view?.state || !state) return;
+		command(state, view.dispatch, view);
+		view.focus();
 	}
 </script>
 

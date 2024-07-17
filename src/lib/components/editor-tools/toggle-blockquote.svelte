@@ -1,10 +1,11 @@
 <script lang="ts">
 	import ToggleButtonBase from './toggle-button-base.svelte';
-	import type { ChildrenProps } from '$lib/index.js';
+	import Quote from 'lucide-svelte/icons/quote';
+	import type { EditorToolProps } from './index.js';
 
-	const { children }: ChildrenProps = $props();
+	const { ...props }: EditorToolProps = $props();
 </script>
 
-<ToggleButtonBase node="blockquote">
-	{@render children()}
+<ToggleButtonBase node="blockquote" {...props}>
+	<Quote class="h-3 w-3 sm:h-4 sm:w-4" />
 </ToggleButtonBase>
