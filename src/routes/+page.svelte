@@ -41,7 +41,7 @@
 		<RichText bind:content={richMultilineContent} multiline />
 	</div>
 
-	<div class="w-14 h-14">
-		<Image maxWidth={160} maxHeight={160} quality={0.8} bind:src alt="tester" />
+	<div class="w-80 h-80">
+		<Image maxWidth={160} maxHeight={160} aspect={1 / 1} quality={0.8} bind:src alt="tester" />
 	</div>
 </div>

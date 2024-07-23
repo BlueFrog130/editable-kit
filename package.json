@@ -60,7 +60,6 @@
 	"type": "module",
 	"dependencies": {
 		"@unocss/reset": "^0.61.3",
-		"cropperjs": "^1.6.2",
 		"unocss": "^0.61.3"
 	}
 }

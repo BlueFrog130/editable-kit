@@ -4,10 +4,10 @@ import type { HTMLImgAttributes } from 'svelte/elements';
 export type ImageProps = {
 	src: string;
 	alt: string;
-	uploadPrompt?: string;
 	maxWidth: number;
 	maxHeight: number;
 	quality: number;
+	aspect: number;
 };
 
 export type CropperProps = {
