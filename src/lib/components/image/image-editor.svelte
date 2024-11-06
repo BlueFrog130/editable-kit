@@ -8,7 +8,7 @@
 	import Test from './test.svelte';
 
 	let {
-		src = $bindable(),
+		src,
 		maxWidth,
 		maxHeight,
 		aspect,

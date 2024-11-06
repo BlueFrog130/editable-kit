@@ -12,13 +12,15 @@
 	import { untrack } from 'svelte';
 	import { textToolbar } from '$lib/editor/toolbars.js';
 
-	let { content = $bindable(), multiline }: PlainTextEditorProps = $props();
+	let { content, multiline }: PlainTextEditorProps = $props();
+
+	let _content = $state(content);
 
 	const schema = $derived(multiline ? multiLinePlainTextSchema : singleLinePlainTextSchema);
 	const doc = $derived(
 		fromHTML(
 			schema,
-			untrack(() => content)
+			untrack(() => _content)
 		)
 	);
 
@@ -28,7 +30,7 @@
 				update(view) {
 					editor.view = view;
 					editor.state = view.state;
-					editor.tools = textToolbar({ view, state: view.state });
+					editor.tools = textToolbar({ view, state: view.state, reset });
 				}
 			};
 		}
@@ -46,7 +48,7 @@
 			dispatchTransaction(this: EditorView, transaction) {
 				const editorState = this.state.apply(transaction);
 				if (transaction.docChanged) {
-					content = toHTML(editorState);
+					_content = toHTML(editorState);
 				}
 				editor.state = editorState;
 				this.updateState(editorState);
@@ -59,6 +61,16 @@
 			}
 		};
 	}
+
+	function reset() {
+		_content = content;
+	}
+
+	$effect(() => {
+		if (content) {
+			reset();
+		}
+	});
 </script>
 
 <div id="prosemirror-editor" use:createEditor></div>

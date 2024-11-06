@@ -13,7 +13,9 @@
 	import { buildInputRules } from '$lib/editor/input-rules.js';
 	import { textToolbar } from '$lib/editor/toolbars.js';
 
-	let { content = $bindable(), multiline }: RichTextEditorProps = $props();
+	let { content, multiline }: RichTextEditorProps = $props();
+
+	let _content = $state(content);
 
 	const schema = $derived(multiline ? multiLineRichTextSchema : singleLineRichTextSchema);
 	const doc = $derived(
@@ -29,7 +31,7 @@
 				update(view) {
 					editor.view = view;
 					editor.state = view.state;
-					editor.tools = textToolbar({ view, state: view.state });
+					editor.tools = textToolbar({ view, state: view.state, reset });
 				}
 			};
 		}
@@ -66,6 +68,16 @@
 			}
 		};
 	}
+
+	function reset() {
+		_content = content;
+	}
+
+	$effect(() => {
+		if (content) {
+			reset();
+		}
+	});
 </script>
 
 <div id="prosemirror-editor" use:createEditor></div>

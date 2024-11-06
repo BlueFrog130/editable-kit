@@ -28,20 +28,20 @@
 		>log content</button
 	>
 	<div>
-		<PlainText bind:content />
+		<PlainText {content} />
 	</div>
 	<div>
-		<PlainText bind:content={multilineContent} multiline />
+		<PlainText content={multilineContent} multiline />
 	</div>
 
 	<div>
-		<RichText bind:content={richContent} />
+		<RichText content={richContent} />
 	</div>
 	<div>
-		<RichText bind:content={richMultilineContent} multiline />
+		<RichText content={richMultilineContent} multiline />
 	</div>
 
 	<div class="w-80 h-80">
-		<Image maxWidth={160} maxHeight={160} aspect={1 / 1} quality={0.8} bind:src alt="tester" />
+		<Image maxWidth={160} maxHeight={160} aspect={1 / 1} quality={0.8} {src} alt="tester" />
 	</div>
 </div>
