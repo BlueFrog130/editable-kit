@@ -2,15 +2,19 @@
 	import type { ImageProps } from './index.js';
 	import { editor } from '$lib/state/index.js';
 
-	let { src, alt, maxHeight, maxWidth, quality, aspect }: ImageProps = $props();
+	let { src, alt, ...props }: ImageProps = $props();
 </script>
 
-{#if editor.isEditing}
+{#snippet img()}
+	<img {src} {alt} />
+{/snippet}
+
+{#if editor.editing}
 	{#await import('./image-editor.svelte')}
-		<img {src} {alt} />
-	{:then ImageEditor}
-		<ImageEditor.default {src} {maxHeight} {maxWidth} {aspect} {quality} />
+		{@render img()}
+	{:then { default: ImageEditor }}
+		<ImageEditor {src} {...props} />
 	{/await}
 {:else}
-	<img width={maxWidth} height={maxHeight} {src} {alt} />
+	{@render img()}
 {/if}

@@ -6,10 +6,10 @@
 </script>
 
 {#if editor.editing}
-	{#await import('./plain-text-editor.svelte')}
+	{#await import('./rich-editor.svelte')}
 		{@html content}
-	{:then { default: PlainTextEditor }}
-		<PlainTextEditor {content} {...props} />
+	{:then { default: RichEditor }}
+		<RichEditor {content} {...props} />
 	{/await}
 {:else}
 	{@html content}

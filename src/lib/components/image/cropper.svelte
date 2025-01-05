@@ -13,22 +13,26 @@
 		src,
 		crop = $bindable({ x: 0, y: 0 }),
 		zoom = $bindable(1),
+		touched = $bindable(false),
 		aspect = 4 / 3,
 		cropShape = 'rect',
 		preview = false,
 		maxWidth,
 		maxHeight,
-		quality
+		quality,
+		onchange
 	}: {
 		src: string;
 		crop?: Point;
 		aspect: number;
 		zoom?: number;
+		touched?: boolean;
 		cropShape?: CropShape;
 		preview?: boolean;
 		maxWidth?: number;
 		maxHeight?: number;
 		quality?: number;
+		onchange?: (data: { crop: Point; zoom: number }) => void;
 	} = $props();
 
 	// State (could be props)
@@ -147,6 +151,8 @@
 		crop = restrictPosition
 			? restrict(requestedPosition, imageSize, cropperSize, zoom)
 			: requestedPosition;
+
+		onchange?.({ crop, zoom });
 	}
 
 	function getPointOnContainer({ x, y }: Point): Point {
@@ -228,6 +234,7 @@
 
 	function onDragStop(e: Event) {
 		cleanDocumentEvents();
+		onchange?.({ crop, zoom });
 	}
 
 	function onTouchMove(e: TouchEvent) {
@@ -332,6 +339,15 @@
 		}
 	});
 
+	// update touched state
+	$effect(() => {
+		if (crop.x !== 0 || crop.y !== 0 || zoom !== 1) {
+			touched = true;
+		} else {
+			touched = false;
+		}
+	});
+
 	export function getCropData() {
 		if (!cropperSize || cropperSize.width === 0) return;
 		const position = crop;
@@ -405,6 +421,11 @@
 				quality ?? 0.8
 			);
 		});
+	}
+
+	export async function file() {
+		const originalName = src.split('/').pop()?.split('.')[0] ?? 'image';
+		return new File([await blob()], `${originalName}.webp`, { type: 'image/webp' });
 	}
 </script>
 

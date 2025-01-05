@@ -1,47 +1,42 @@
 <script lang="ts">
-	import { EditorToolbar } from '$lib/components/editor-toolbar/index.js';
+	import EditorContext from '$lib/components/editor/editor-context.svelte';
 	import { Image } from '$lib/components/image/index.js';
-	import { PlainText } from '$lib/components/plain-text/index.js';
-	import { RichText } from '$lib/components/rich-text/index.js';
-	import { editor } from '$lib/index.js';
+	import Toolbar from '$lib/components/toolbar/toolbar.svelte';
+	import { editor } from '$lib/state/editor.svelte.js';
+	import type { EditorData, ImageKeys, StringKeys } from '$lib/types.js';
 	import { onMount } from 'svelte';
 
-	let content = $state('Page content');
-	let multilineContent = $state('Page content 2');
+	const data = {
+		title: 'Hello World',
+		description: `<p> This is a test </p>`,
+		content: `<p> This is a <strong>test</strong> also</p>`,
+		image: {
+			src: 'https://via.placeholder.com/150',
+			alt: 'tester'
+		}
+	};
 
-	let richContent = $state('Page content 3');
-	let richMultilineContent = $state('Page content 4');
-
-	let src = $state('');
+	type Test = StringKeys<typeof data>;
+	type Test2 = ImageKeys<typeof data>;
 
 	onMount(() => {
-		editor.isEditing = true;
+		editor.editing = true;
 	});
 </script>
 
-<EditorToolbar />
-
 <div class="container mx-auto py-12">
-	<input type="checkbox" bind:checked={editor.isEditing} /> Edit mode
-	<button
-		onclick={() => console.log({ content, multilineContent, richContent, richMultilineContent })}
-		>log content</button
-	>
-	<div>
-		<PlainText {content} />
-	</div>
-	<div>
-		<PlainText content={multilineContent} multiline />
-	</div>
+	<Toolbar />
 
-	<div>
-		<RichText content={richContent} />
-	</div>
-	<div>
-		<RichText content={richMultilineContent} multiline />
-	</div>
+	<input type="checkbox" bind:checked={editor.editing} /> Edit mode
 
-	<div class="w-80 h-80">
-		<Image maxWidth={160} maxHeight={160} aspect={1 / 1} quality={0.8} {src} alt="tester" />
-	</div>
+	<EditorContext {data}>
+		{#snippet children({ plainText, multilinePlainText, rich, image })}
+			{@render plainText('title')}
+			{@render multilinePlainText('description')}
+			{@render rich('content')}
+			<div class="w-80 h-80">
+				{@render image('image', { maxWidth: 320, maxHeight: 320, quality: 0.8, aspect: 1 / 1 })}
+			</div>
+		{/snippet}
+	</EditorContext>
 </div>

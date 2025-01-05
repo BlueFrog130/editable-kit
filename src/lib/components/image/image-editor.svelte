@@ -1,33 +1,28 @@
 <script lang="ts">
-	import { tool } from '$lib/editor/toolbars.js';
-	import { editor } from '$lib/state/index.svelte.js';
-	import CropButton from './crop-button.svelte';
-	import ReplaceButton from './replace-button.svelte';
 	import Cropper from './cropper.svelte';
-	import { customAlphabet } from 'nanoid';
-	import Test from './test.svelte';
 
 	let {
 		src,
 		maxWidth,
 		maxHeight,
 		aspect,
-		quality
+		quality,
+		onchange
 	}: {
 		src: string;
 		aspect: number;
 		maxWidth?: number;
 		maxHeight?: number;
 		quality?: number;
+		onchange?: (data: { crop: Point; zoom: number }) => void;
 	} = $props();
+	import { editor } from '$lib/state/editor.svelte.js';
+	import type { Point } from './types.js';
 
 	let editing = $state(false);
 	let el: HTMLElement;
-	let cropper: Cropper | undefined = $state();
-
-	const alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-	const nanoid = customAlphabet(alphabet, 10);
-	let id = nanoid();
+	let cropper: ReturnType<typeof Cropper> | undefined = $state();
+	let touched = $state(false);
 
 	function insertFile(event: Event & { currentTarget: EventTarget & HTMLInputElement }) {
 		const file = event.currentTarget.files?.[0];
@@ -43,16 +38,17 @@
 
 	function onFocus() {
 		editing = true;
-		editor.tools = [
-			tool(CropButton, { onclick: () => {} }),
-			tool(ReplaceButton, { onclick: replaceImage }),
-			tool(Test, { onclick: test })
-		];
+		editor.active = {
+			type: 'image',
+			editor: {
+				replaceImage,
+				test
+			}
+		};
 	}
 
 	async function outFocus() {
 		editing = false;
-		console.log(cropper?.getCropData());
 	}
 
 	function replaceImage() {
@@ -85,7 +81,6 @@
 
 <button
 	bind:this={el}
-	{id}
 	class="w-full h-full [&.editing]:ring-1 hover:ring-1 ring-[#39f] group relative"
 	class:editing
 	onfocusin={onFocus}
@@ -95,12 +90,14 @@
 	{#if src}
 		<Cropper
 			bind:this={cropper}
+			bind:touched
 			{src}
 			{aspect}
 			preview={!editing}
 			{maxHeight}
 			{maxWidth}
 			{quality}
+			{onchange}
 		/>
 	{:else}
 		<label class="grid place-content-center w-full h-full bg-gray cursor-pointer">
