@@ -385,7 +385,7 @@
 		});
 
 		// Convert to Blob
-		const canvas = document.createElement('canvas');
+		const canvas = document.createElement('canvas').transferControlToOffscreen();
 		const ctx = canvas.getContext('2d');
 
 		if (!ctx) {
@@ -409,17 +409,9 @@
 
 		ctx.drawImage(image, x, y, width, height, 0, 0, canvas.width, canvas.height);
 
-		return await new Promise<Blob>((resolve) => {
-			canvas.toBlob(
-				(blob) => {
-					if (!blob) {
-						throw new Error('No blob');
-					}
-					resolve(blob);
-				},
-				'image/webp',
-				quality ?? 0.8
-			);
+		return canvas.convertToBlob({
+			type: 'image/webp',
+			quality: quality ?? 0.8
 		});
 	}
 
