@@ -1,7 +1,7 @@
 import { editor } from '$lib/state/editor.svelte.js';
-import type { EditorData } from '$lib/types.js';
-import { getContext, setContext, untrack } from 'svelte';
-import { SvelteMap } from 'svelte/reactivity';
+import type { EditorData, EditorSaveData, MaybePromise } from '$lib/types.js';
+import { getContext, setContext, untrack, type Component } from 'svelte';
+import type { EditorComponent, EditorContent } from './index.js';
 
 type RegistrationKey = string | number | Symbol;
 
@@ -12,11 +12,14 @@ type EditorRegistration = {
 
 const editorContextKey = Symbol();
 
-function editorContextState<T extends EditorData>(data: T) {
+function editorContextState<T extends EditorData>(
+	data: T,
+	onsave?: (data: EditorSaveData<T>) => MaybePromise<void>
+) {
 	const original = data;
 	let d: null | T = $state(null);
-	const components: SvelteMap<RegistrationKey, EditorRegistration> = $state(
-		new SvelteMap<RegistrationKey, EditorRegistration>()
+	const components: Record<keyof T, EditorComponent> = $state(
+		{} as Record<keyof T, EditorComponent>
 	);
 
 	const modified = $derived(Object.keys(d ?? {}).some((key) => d![key] !== original[key]));
@@ -37,35 +40,31 @@ function editorContextState<T extends EditorData>(data: T) {
 		get modified() {
 			return modified;
 		},
+		get components() {
+			return components;
+		},
 		reset() {
 			d = { ...original };
 		},
-		register(registration: EditorRegistration) {
-			if (components.has(registration.name)) {
-				throw new Error(`Editor with name ${registration.name} is already registered`);
-			}
+		async save() {
+			if (d === null) return;
 
-			components.set(registration.name, registration);
-
-			return () => {
-				components.delete(registration.name);
-			};
+			const entries = await Promise.all(
+				Object.entries(components).map(async ([key, component]) => [
+					key,
+					await component.getContent()
+				])
+			);
+			const data = Object.fromEntries(entries);
+			onsave?.(data);
 		}
 	};
 }
 
-export const setEditorContext = <T extends EditorData>(data: T) =>
-	setContext(editorContextKey, editorContextState(data));
+export const setEditorContext = <T extends EditorData>(
+	data: T,
+	onsave: (data: EditorSaveData<T>) => MaybePromise<void>
+) => setContext(editorContextKey, editorContextState(data, onsave));
 
 export const getEditorContext = <T extends EditorData>() =>
 	getContext<ReturnType<typeof editorContextState<T>>>(editorContextKey);
-
-export const registerEditor = <T extends EditorData>(registration: EditorRegistration) => {
-	const ctx = getEditorContext<T>();
-
-	$effect(() => {
-		const dispose = ctx.register(registration);
-
-		return dispose;
-	});
-};

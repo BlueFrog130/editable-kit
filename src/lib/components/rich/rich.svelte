@@ -1,15 +1,22 @@
 <script lang="ts">
-	import { editor } from '$lib/state/index.js';
-	import type { EditorComponentProps } from '../editor/index.js';
+	import { editor as editorState } from '$lib/state/index.js';
+	import type { EditorContentProps } from '../editor/index.js';
 
-	let { content, ...props }: EditorComponentProps = $props();
+	let { editor = $bindable(), content, ...props }: EditorContentProps = $props();
 </script>
 
-{#if editor.editing}
-	{#await import('./rich-editor.svelte')}
+{#if editorState.editing}
+	{#await Promise.all([import('../editor/editor.svelte'), import('@tiptap/core'), import('../editor/index.js')])}
 		{@html content}
-	{:then { default: RichEditor }}
-		<RichEditor {content} {...props} />
+	{:then [{ default: Editor }, { Editor: Tiptap }, { rich }]}
+		<Editor
+			bind:this={editor}
+			tiptap={Tiptap}
+			{content}
+			extensions={rich}
+			{...editorState.props}
+			{...props}
+		/>
 	{/await}
 {:else}
 	{@html content}

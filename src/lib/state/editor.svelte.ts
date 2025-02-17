@@ -7,7 +7,6 @@ export type Editable =
 			type: 'image';
 			editor: {
 				replaceImage: () => void;
-				test: () => void;
 			};
 	  }
 	| {

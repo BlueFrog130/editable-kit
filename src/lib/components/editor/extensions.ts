@@ -16,7 +16,7 @@ import Blockquote from '@tiptap/extension-blockquote';
 import HardBreak from '@tiptap/extension-hard-break';
 import Gapcursor from '@tiptap/extension-gapcursor';
 import Underline from '@tiptap/extension-underline';
-import { Extension, posToDOMRect } from '@tiptap/core';
+import { posToDOMRect } from '@tiptap/core';
 import { NodeSelection, Plugin, PluginKey } from '@tiptap/pm/state';
 
 export const plain = [

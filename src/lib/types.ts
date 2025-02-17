@@ -11,6 +11,16 @@ export type ImageEditState = {
 };
 
 export type EditorData = { [key: string]: string | ImageState | ImageEditState };
+/**
+ * Transformed editor data into the following
+ * string -> { type: 'text', content: string }
+ * ImageState -> { type: 'image', content: null | Blob }
+ */
+export type EditorSaveData<T extends EditorData> = {
+	[P in keyof T]: T[P] extends string
+		? { type: 'text'; content: string }
+		: { type: 'image'; content: null | Blob };
+};
 
 type KeysWithValsOfType<T, V> = keyof { [P in keyof T as T[P] extends V ? P : never]: P } & keyof T;
 

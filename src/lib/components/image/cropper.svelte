@@ -195,6 +195,9 @@
 	}
 
 	function containerWheel(e: WheelEvent) {
+		// Skip if preview
+		if (preview) return;
+
 		e.preventDefault();
 		const point = getMousePoint(e);
 		const newZoom = zoom - (e.deltaY * zoomSpeed) / 200;
@@ -380,6 +383,7 @@
 		const image = await new Promise<HTMLImageElement>((resolve, reject) => {
 			const image = new Image();
 			image.src = src;
+			image.crossOrigin = 'anonymous';
 			image.onload = () => resolve(image);
 			image.onerror = reject;
 		});
@@ -442,8 +446,10 @@
 	</div>
 	{#if cropperSize && !preview}
 		<div
-			class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 box-border text-black/50 overflow-hidden before:content-[''] before:box-border before:border-x-1 before:border-y-0 before:border-white/50 before:absolute before:inset-y-0 before:inset-x-1/3 after:content-[''] after:box-border after:border-x-0 after:border-y-1 after:border-white/50 after:absolute after:inset-y-1/3 after:inset-x-0 [&.crop-round]:rounded-full"
-			class:crop-round={cropShape === 'round'}
+			class={[
+				"absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 box-border text-black/50 overflow-hidden before:content-[''] before:box-border before:border-x-1 before:border-y-0 before:border-white/50 before:absolute before:inset-y-0 before:inset-x-1/3 after:content-[''] after:box-border after:border-x-0 after:border-y-1 after:border-white/50 after:absolute after:inset-y-1/3 after:inset-x-0 [&.crop-round]:rounded-full",
+				cropShape === 'round' && 'rounded-full'
+			]}
 			style:width="{cropperSize.width}px"
 			style:height="{cropperSize.height}px"
 		></div>

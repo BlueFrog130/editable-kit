@@ -4,16 +4,23 @@
 	import { PlainText as PlainTextComponent } from '../plain-text/index.js';
 	import { MultilinePlainText as MultilinePlainTextComponent } from '../multiline-plain-text/index.js';
 	import { Rich as RichComponent } from '../rich/index.js';
-	import { debounce } from '$lib/util/debounce.js';
-	import type { Editor, EditorEvents } from '@tiptap/core';
 	import type { EditorComponentProps } from './index.js';
 	import Image from '../image/image.svelte';
-	import type { EditorData, ImageKeys, ImageState, StringKeys } from '$lib/types.js';
+	import type {
+		EditorData,
+		EditorSaveData,
+		ImageKeys,
+		ImageState,
+		MaybePromise,
+		StringKeys
+	} from '$lib/types.js';
+	import Toolbar from '../toolbar/toolbar.svelte';
 
 	type TextEditorSnippet = Snippet<[StringKeys<T>]>;
 
 	type Props = {
 		data: T;
+		onsave: (data: EditorSaveData<T>) => MaybePromise<void>;
 		children: Snippet<
 			[
 				{
@@ -28,18 +35,11 @@
 		>;
 	};
 
-	let { data, children }: Props = $props();
+	let { data, onsave, children }: Props = $props();
 
-	const ctx = setEditorContext(data);
+	const ctx = setEditorContext(data, onsave);
 
 	$inspect({ data: ctx.data });
-
-	const updater = (fn: (e: EditorEvents['update']) => void) =>
-		debounce(fn, {
-			timing: 'trailing',
-			maxWaitMs: 1000,
-			waitMs: 500
-		});
 
 	const editorProps = (key: StringKeys<T>): EditorComponentProps => {
 		return {
@@ -65,23 +65,25 @@
 </script>
 
 {#snippet plainText(name: StringKeys<T>)}
-	<PlainTextComponent {...editorProps(name)} />
+	<PlainTextComponent bind:editor={ctx.components[name]} {...editorProps(name)} />
 {/snippet}
 
 {#snippet multilinePlainText(name: StringKeys<T>)}
-	<MultilinePlainTextComponent {...editorProps(name)} />
+	<MultilinePlainTextComponent bind:editor={ctx.components[name]} {...editorProps(name)} />
 {/snippet}
 
 {#snippet rich(name: StringKeys<T>)}
-	<RichComponent {...editorProps(name)} />
+	<RichComponent bind:editor={ctx.components[name]} {...editorProps(name)} />
 {/snippet}
 
 {#snippet image(
 	name: ImageKeys<T>,
 	options: { maxWidth: number; maxHeight: number; quality: number; aspect: number }
 )}
-	<Image {...imageProps(name, options)} />
+	<Image bind:editor={ctx.components[name]} {...imageProps(name, options)} />
 {/snippet}
+
+<Toolbar onsave={ctx.save} />
 
 {@render children({
 	plainText,

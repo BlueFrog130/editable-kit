@@ -1,15 +1,22 @@
 <script lang="ts">
-	import { editor } from '$lib/state/index.js';
-	import type { EditorComponentProps } from '../editor/index.js';
+	import { editor as editorState } from '$lib/state/index.js';
+	import type { EditorContentProps } from '../editor/index.js';
 
-	let { content = $bindable(), ...props }: EditorComponentProps = $props();
+	let { editor = $bindable(), content, ...props }: EditorContentProps = $props();
 </script>
 
-{#if editor.editing}
-	{#await import('./multiline-plain-text-editor.svelte')}
+{#if editorState.editing}
+	{#await Promise.all([import('../editor/editor.svelte'), import('@tiptap/core'), import('../editor/index.js')])}
 		{@html content}
-	{:then { default: MultilinePlainTextEditor }}
-		<MultilinePlainTextEditor {content} {...props} />
+	{:then [{ default: Editor }, { Editor: Tiptap }, { multiline }]}
+		<Editor
+			bind:this={editor}
+			tiptap={Tiptap}
+			{content}
+			extensions={multiline}
+			{...editorState.props}
+			{...props}
+		/>
 	{/await}
 {:else}
 	{@html content}

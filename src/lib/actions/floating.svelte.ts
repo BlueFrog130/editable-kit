@@ -1,6 +1,4 @@
-import type { ComputePositionConfig } from '@floating-ui/dom';
-import { autoUpdate } from '@floating-ui/dom';
-import { computePosition } from '@floating-ui/dom';
+import { autoUpdate, computePosition, type ComputePositionConfig } from '@floating-ui/dom';
 import type { Action } from 'svelte/action';
 
 export type Reference = Action;

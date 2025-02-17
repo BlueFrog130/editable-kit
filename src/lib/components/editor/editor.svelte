@@ -1,18 +1,19 @@
 <script lang="ts">
-	import { Editor, type EditorEvents, type Extensions } from '@tiptap/core';
+	import type { Editor, EditorEvents, EditorOptions, Extensions } from '@tiptap/core';
 	import type { Action } from 'svelte/action';
-	import { registerEditor } from './editor-context-state.svelte.js';
 
 	type Props = {
-		name?: string | number | Symbol;
 		content: string;
 		extensions: Extensions;
+		tiptap: {
+			new (options: Partial<EditorOptions>): Editor;
+		};
 		onfocus?: (editor: Editor) => void;
 		oncreate?: (editor: Editor) => void;
 		ondestroy?: (editor: Editor | null) => void;
 	};
 
-	let { name, content, extensions, onfocus, oncreate, ondestroy }: Props = $props();
+	let { content, extensions, tiptap, onfocus, oncreate, ondestroy }: Props = $props();
 
 	let _editor: Editor | null = null;
 
@@ -21,7 +22,7 @@
 	};
 
 	const editor: Action<HTMLElement> = (element) => {
-		_editor = new Editor({
+		_editor = new tiptap({
 			element,
 			content,
 			extensions,
@@ -43,20 +44,13 @@
 		};
 	};
 
-	if (name) {
-		registerEditor({
-			name,
-			getContent() {
-				if (!_editor) throw new Error('Editor not initialized');
-				return _editor.getHTML();
-			}
-		});
-	}
-
-	export const getHtml = () => {
+	export async function getContent() {
 		if (!_editor) throw new Error('Editor not initialized');
-		return _editor.getHTML();
-	};
+		return {
+			type: 'text' as const,
+			content: _editor.getHTML()
+		};
+	}
 </script>
 
 <div class="contents" use:editor></div>

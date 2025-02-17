@@ -41,8 +41,7 @@
 		editor.active = {
 			type: 'image',
 			editor: {
-				replaceImage,
-				test
+				replaceImage
 			}
 		};
 	}
@@ -62,20 +61,16 @@
 		input.click();
 	}
 
-	async function test() {
-		const blob = await cropper?.blob();
-
-		if (!blob) {
-			throw new Error('No image to download');
-		}
-
-		// Download the blob
-		const url = URL.createObjectURL(blob);
-		const a = document.createElement('a');
-		a.href = url;
-		a.download = 'image.webp';
-		a.click();
-		URL.revokeObjectURL(url);
+	export async function getContent() {
+		if (!touched || !cropper)
+			return {
+				type: 'image' as const,
+				content: null
+			};
+		return {
+			type: 'image' as const,
+			content: await cropper.blob()
+		};
 	}
 </script>
 
