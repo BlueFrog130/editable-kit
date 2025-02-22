@@ -1,13 +1,18 @@
 <script lang="ts">
 	import Cropper from './cropper.svelte';
 
+	type FocusUtils = {
+		replaceImage: () => void;
+	};
+
 	let {
 		src,
 		maxWidth,
 		maxHeight,
 		aspect,
 		quality,
-		onchange
+		onchange,
+		onfocus
 	}: {
 		src: string;
 		aspect: number;
@@ -15,8 +20,8 @@
 		maxHeight?: number;
 		quality?: number;
 		onchange?: (data: { crop: Point; zoom: number }) => void;
+		onfocus?: (e: FocusUtils) => void;
 	} = $props();
-	import { editor } from '$lib/state/editor.svelte.js';
 	import type { Point } from './types.js';
 
 	let editing = $state(false);
@@ -38,12 +43,9 @@
 
 	function onFocus() {
 		editing = true;
-		editor.active = {
-			type: 'image',
-			editor: {
-				replaceImage
-			}
-		};
+		onfocus?.({
+			replaceImage
+		});
 	}
 
 	async function outFocus() {

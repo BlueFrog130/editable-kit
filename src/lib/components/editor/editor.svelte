@@ -26,19 +26,17 @@
 			element,
 			content,
 			extensions,
-			autofocus: true,
+			autofocus: false,
 			editable: true,
-			injectCSS: true
+			injectCSS: true,
+			onFocus: handleFocus
 		});
-
-		_editor.on('focus', handleFocus);
 
 		oncreate?.(_editor);
 
 		return {
 			destroy() {
 				ondestroy?.(_editor);
-				_editor?.off('focus', handleFocus);
 				_editor?.destroy();
 			}
 		};

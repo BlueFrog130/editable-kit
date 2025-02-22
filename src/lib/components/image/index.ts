@@ -1,7 +1,6 @@
 import type { Point } from './types.js';
 
 export type ImageProps = {
-	name: string | number | Symbol;
 	src: string;
 	alt: string;
 	maxWidth: number;

@@ -1,27 +1,28 @@
 <script lang="ts">
-	import { editor as editorState } from '$lib/state/index.js';
-	import type { EditorContentProps } from '../editor/index.js';
+	import { importEditor, type EditorContentProps } from '../editor/index.js';
 
-	let { editor = $bindable(), content, ...props }: EditorContentProps = $props();
-
-	$inspect({ editor });
+	let { editor = $bindable(), editing, content, ...props }: EditorContentProps = $props();
 </script>
 
-{#if editorState.editing}
-	{#await Promise.all([import('../editor/editor.svelte'), import('@tiptap/core'), import('../editor/index.js')])}
-		{@html content}
-	{:then [{ default: Editor }, { Editor: Tiptap }, { plain }]}
+{#snippet html()}
+	{@html content}
+{/snippet}
+
+{#if editing}
+	{#await importEditor()}
+		{@render html()}
+	{:then [{ Editor: Tiptap }, { default: Editor }, { plain }, { toolbarState }]}
 		<div class="contents [&_.ProseMirror]:inline-block">
 			<Editor
 				bind:this={editor}
 				tiptap={Tiptap}
 				{content}
 				extensions={plain}
-				{...editorState.props}
+				{...toolbarState.props}
 				{...props}
 			/>
 		</div>
 	{/await}
 {:else}
-	{@html content}
+	{@render html()}
 {/if}

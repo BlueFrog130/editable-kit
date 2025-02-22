@@ -1,7 +1,9 @@
 <script lang="ts">
 	import EditorContext from '$lib/components/editor/editor-context.svelte';
-	import { editor } from '$lib/state/editor.svelte.js';
+	import { Toolbar } from '$lib/components/toolbar/index.js';
 	import type { EditorSaveData, MaybePromise } from '$lib/types.js';
+
+	let editing = $state(false);
 
 	const data = {
 		title: 'Hello World',
@@ -33,16 +35,23 @@
 </script>
 
 <div class="container mx-auto py-12">
-	<input type="checkbox" bind:checked={editor.editing} /> Edit mode
+	<button onclick={() => (editing = true)}>Edit</button>
 
-	<EditorContext {data} onsave={handleSave}>
+	<Toolbar {editing} />
+
+	<EditorContext {data} onsave={handleSave} {editing}>
 		{#snippet children({ plainText, multilinePlainText, rich, image })}
 			<main>
-				<h1>{@render plainText('title')}</h1>
-				{@render multilinePlainText('description')}
-				{@render rich('content')}
+				<h1>{@render plainText((d) => d.title)}</h1>
+				{@render multilinePlainText((d) => d.description)}
+				{@render rich((d) => d.content)}
 				<div class="w-80 h-80">
-					{@render image('image', { maxWidth: 320, maxHeight: 320, quality: 0.8, aspect: 1 / 1 })}
+					{@render image((d) => d.image, {
+						maxWidth: 320,
+						maxHeight: 320,
+						quality: 0.8,
+						aspect: 1 / 1
+					})}
 				</div>
 			</main>
 		{/snippet}

@@ -1,21 +1,12 @@
-import { debounce } from '$lib/util/debounce.js';
+/**
+ * Global toolbar state
+ */
+import type { Editable } from '$lib/types.js';
 import type { Editor } from '@tiptap/core';
 import type { Transaction } from '@tiptap/pm/state';
+import { debounce } from '$lib/util/debounce.js';
 
-export type Editable =
-	| {
-			type: 'image';
-			editor: {
-				replaceImage: () => void;
-			};
-	  }
-	| {
-			type: 'text';
-			editor: Editor;
-	  };
-
-class EditorState {
-	editing = $state(false);
+class ToolbarStateClass {
 	active: Editable | undefined = $state.raw(undefined);
 
 	props = {
@@ -79,5 +70,5 @@ class EditorState {
 	}
 }
 
-export const editor = new EditorState();
-export type EditorStateType = InstanceType<typeof EditorState>;
+export const toolbarState = new ToolbarStateClass();
+export type ToolbarState = ToolbarStateClass;
