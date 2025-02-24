@@ -13,7 +13,7 @@
 		ondestroy?: (editor: Editor | null) => void;
 	};
 
-	let { content, extensions, tiptap, onfocus, oncreate, ondestroy }: Props = $props();
+	let { content = $bindable(), extensions, tiptap, onfocus, oncreate, ondestroy }: Props = $props();
 
 	let _editor: Editor | null = null;
 
@@ -48,6 +48,10 @@
 			type: 'text' as const,
 			content: _editor.getHTML()
 		};
+	}
+
+	export async function setContent() {
+		content = _editor?.getHTML() ?? '';
 	}
 </script>
 

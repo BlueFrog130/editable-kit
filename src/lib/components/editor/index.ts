@@ -1,8 +1,6 @@
 import type { Editor } from '@tiptap/core';
 import type { Component } from 'svelte';
 
-export { default as Editor } from './editor.svelte';
-
 export type EditorContentProps = {
 	editor: EditorComponent;
 	editing: boolean;
@@ -12,6 +10,7 @@ export type EditorComponentProps = {
 	content: string;
 	oncreate?: (editor: Editor) => void;
 	ondestroy?: (editor: Editor | null) => void;
+	onfocus?: (editor: Editor) => void;
 };
 
 export type EditorContent =
@@ -24,13 +23,14 @@ export type EditorContent =
 			content: null | Blob;
 	  };
 export type EditorGetContentFn = () => Promise<EditorContent>;
-export type EditorComponent = ReturnType<Component<any, { getContent: EditorGetContentFn }>>;
+export type EditorComponent = ReturnType<
+	Component<any, { getContent: EditorGetContentFn; setContent: () => Promise<void> }>
+>;
 
 export function importEditor() {
 	return Promise.all([
 		import('@tiptap/core'),
 		import('./editor.svelte'),
-		import('./extensions.js'),
-		import('$lib/state/toolbar-state.svelte.js')
+		import('./extensions.js')
 	]);
 }

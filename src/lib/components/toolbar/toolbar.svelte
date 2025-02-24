@@ -21,9 +21,9 @@
 	import { Menu } from '../ui/floating/index.js';
 	import type { Editable, MaybePromise } from '$lib/types.js';
 	import { fly } from 'svelte/transition';
-	import type { ToolbarState } from '$lib/state/toolbar-state.svelte.js';
+	import type { EditableState } from '$lib/components/editable/editable-state.svelte.js';
 
-	let { onsave, state: toolbarState }: { onsave: () => MaybePromise<void>; state: ToolbarState } =
+	let { onsave, state: toolbarState }: { onsave: () => MaybePromise<void>; state: EditableState } =
 		$props();
 
 	type Value<T> = { value: T };

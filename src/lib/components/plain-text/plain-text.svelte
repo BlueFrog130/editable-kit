@@ -1,7 +1,12 @@
 <script lang="ts">
 	import { importEditor, type EditorContentProps } from '../editor/index.js';
 
-	let { editor = $bindable(), editing, content, ...props }: EditorContentProps = $props();
+	let {
+		content = $bindable(),
+		editor = $bindable(),
+		editing,
+		...props
+	}: EditorContentProps = $props();
 </script>
 
 {#snippet html()}
@@ -11,16 +16,9 @@
 {#if editing}
 	{#await importEditor()}
 		{@render html()}
-	{:then [{ Editor: Tiptap }, { default: Editor }, { plain }, { toolbarState }]}
+	{:then [{ Editor: Tiptap }, { default: Editor }, { plain }]}
 		<div class="contents [&_.ProseMirror]:inline-block">
-			<Editor
-				bind:this={editor}
-				tiptap={Tiptap}
-				{content}
-				extensions={plain}
-				{...toolbarState.props}
-				{...props}
-			/>
+			<Editor bind:this={editor} tiptap={Tiptap} bind:content extensions={plain} {...props} />
 		</div>
 	{/await}
 {:else}

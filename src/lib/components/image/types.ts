@@ -23,3 +23,7 @@ export type CropArea = {
 	width: number;
 	height: number;
 };
+
+export type FocusUtils = {
+	replaceImage: () => void;
+};

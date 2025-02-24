@@ -1,7 +1,12 @@
 <script lang="ts">
 	import { importEditor, type EditorContentProps } from '../editor/index.js';
 
-	let { editor = $bindable(), editing, content, ...props }: EditorContentProps = $props();
+	let {
+		content = $bindable(),
+		editor = $bindable(),
+		editing,
+		...props
+	}: EditorContentProps = $props();
 </script>
 
 {#snippet html()}
@@ -11,15 +16,8 @@
 {#if editing}
 	{#await importEditor()}
 		{@render html()}
-	{:then [{ Editor: Tiptap }, { default: Editor }, { multiline }, { toolbarState }]}
-		<Editor
-			bind:this={editor}
-			tiptap={Tiptap}
-			{content}
-			extensions={multiline}
-			{...toolbarState.props}
-			{...props}
-		/>
+	{:then [{ Editor: Tiptap }, { default: Editor }, { multiline }]}
+		<Editor bind:this={editor} tiptap={Tiptap} bind:content extensions={multiline} {...props} />
 	{/await}
 {:else}
 	{@render html()}

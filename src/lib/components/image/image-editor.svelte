@@ -1,12 +1,9 @@
 <script lang="ts">
+	import type { FocusUtils, Point } from './types.js';
 	import Cropper from './cropper.svelte';
 
-	type FocusUtils = {
-		replaceImage: () => void;
-	};
-
 	let {
-		src,
+		src = $bindable(),
 		maxWidth,
 		maxHeight,
 		aspect,
@@ -22,7 +19,6 @@
 		onchange?: (data: { crop: Point; zoom: number }) => void;
 		onfocus?: (e: FocusUtils) => void;
 	} = $props();
-	import type { Point } from './types.js';
 
 	let editing = $state(false);
 	let el: HTMLElement;
@@ -74,6 +70,8 @@
 			content: await cropper.blob()
 		};
 	}
+
+	export async function setContent() {}
 </script>
 
 <button

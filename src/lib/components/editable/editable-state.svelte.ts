@@ -6,16 +6,8 @@ import type { Editor } from '@tiptap/core';
 import type { Transaction } from '@tiptap/pm/state';
 import { debounce } from '$lib/util/debounce.js';
 
-class ToolbarStateClass {
+export class EditableState {
 	active: Editable | undefined = $state.raw(undefined);
-
-	props = {
-		onfocus: (editor: Editor) =>
-			(this.active = {
-				type: 'text',
-				editor
-			})
-	};
 
 	has(extension: string) {
 		let has = $derived.by(() => {
@@ -69,6 +61,3 @@ class ToolbarStateClass {
 		return fn(this.active.editor);
 	}
 }
-
-export const toolbarState = new ToolbarStateClass();
-export type ToolbarState = ToolbarStateClass;

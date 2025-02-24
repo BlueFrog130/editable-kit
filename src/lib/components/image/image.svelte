@@ -1,14 +1,13 @@
 <script lang="ts">
 	import type { ImageProps } from './index.js';
-	import type { EditorComponent } from '../editor/index.js';
 
 	let {
+		src = $bindable(),
+		alt = $bindable(),
 		editor = $bindable(),
 		editing,
-		src,
-		alt,
 		...props
-	}: ImageProps & { editor: EditorComponent; editing: boolean } = $props();
+	}: ImageProps = $props();
 </script>
 
 {#snippet img()}
@@ -16,22 +15,10 @@
 {/snippet}
 
 {#if editing}
-	{#await Promise.all([import('./image-editor.svelte'), import('$lib/state/toolbar-state.svelte.js')])}
+	{#await Promise.all([import('./image-editor.svelte'), import('$lib/components/editable/editable-state.svelte.js')])}
 		{@render img()}
-	{:then [{ default: ImageEditor }, { toolbarState }]}
-		<ImageEditor
-			bind:this={editor}
-			{src}
-			{...props}
-			onfocus={({ replaceImage }) => {
-				toolbarState.active = {
-					type: 'image',
-					editor: {
-						replaceImage
-					}
-				};
-			}}
-		/>
+	{:then [{ default: ImageEditor }]}
+		<ImageEditor bind:this={editor} {src} {...props} />
 	{/await}
 {:else}
 	{@render img()}
