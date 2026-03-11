@@ -4,7 +4,6 @@
 	import {
 		computeCroppedArea,
 		getCenter,
-		getCropSize,
 		getDistanceBetweenPoints,
 		restrictPosition as restrict
 	} from './util.js';
@@ -14,7 +13,7 @@
 		crop = $bindable({ x: 0, y: 0 }),
 		zoom = $bindable(1),
 		touched = $bindable(false),
-		aspect = 4 / 3,
+		aspect,
 		cropShape = 'rect',
 		preview = false,
 		maxWidth,
@@ -24,7 +23,7 @@
 	}: {
 		src: string;
 		crop?: Point;
-		aspect: number;
+		aspect?: number;
 		zoom?: number;
 		touched?: boolean;
 		cropShape?: CropShape;
@@ -46,7 +45,7 @@
 	// Reactive state
 	// ------------------------------
 
-	let imageSize: ImageSize & { left: number; top: number } = $state({
+	let imageSize: ImageSize & { left: number; top: number } = $state.raw({
 		width: 0,
 		height: 0,
 		naturalWidth: 0,
@@ -54,7 +53,7 @@
 		left: 0,
 		top: 0
 	});
-	let containerRect: DOMRect | null = $state(null);
+	let containerRect: DOMRect | null = $state.raw(null);
 	let dragStartPosition = { x: 0, y: 0 };
 	let dragStartCrop = { x: 0, y: 0 };
 	let lastPinchDistance = 0;
@@ -65,19 +64,22 @@
 	// Derived state
 	// ------------------------------
 
-	const computedAspect = $derived.by(() => {
-		// if (cropSize) {
-		// 	return cropSize.width / cropSize.height;
-		// }
-		return aspect;
+	// When no aspect is provided, use the container's natural aspect ratio
+	const effectiveAspect = $derived.by(() => {
+		if (aspect) return aspect;
+		if (containerRect) return containerRect.width / containerRect.height;
+		return 1;
 	});
 
 	const cropperSize = $derived.by<Size | null>(() => {
 		if (!containerRect) return null;
-		return {
-			height: containerRect.height,
-			width: containerRect.width
-		};
+		const cw = containerRect.width;
+		const ch = containerRect.height;
+		if (cw / ch > effectiveAspect) {
+			return { width: ch * effectiveAspect, height: ch };
+		} else {
+			return { width: cw, height: cw / effectiveAspect };
+		}
 	});
 
 	// ------------------------------
@@ -92,31 +94,30 @@
 	// ------------------------------
 
 	function computeSizes() {
-		const scaledImageSize = { width: 0, height: 0, left: 0, top: 0 };
 		if (containerEl) {
 			containerRect = containerEl.getBoundingClientRect();
-			scaledImageSize.width = containerRect.width;
-			scaledImageSize.height = containerRect.height;
 		}
-		if (imageEl) {
+		if (imageEl && containerRect) {
 			const naturalAspect = imageEl.naturalWidth / imageEl.naturalHeight;
-			const desiredWidth = scaledImageSize.width;
-			const desiredHeight = scaledImageSize.height;
+			const containerAspect = containerRect.width / containerRect.height;
 
-			// If the image is wider than the aspect, we need to scale it to the height
-			if (naturalAspect > computedAspect) {
-				scaledImageSize.width = desiredHeight * naturalAspect;
-				scaledImageSize.height = desiredHeight;
-				// center the image -- margin auto doesn't work
-				scaledImageSize.left = (desiredWidth - scaledImageSize.width) / 2;
+			// Size the image to cover the container (matches object-fit: cover behavior)
+			const scaledImageSize = { width: 0, height: 0 };
+			if (naturalAspect > containerAspect) {
+				scaledImageSize.height = containerRect.height;
+				scaledImageSize.width = containerRect.height * naturalAspect;
 			} else {
-				scaledImageSize.width = desiredWidth;
-				scaledImageSize.height = desiredWidth / naturalAspect;
-				// margin auto works vertically
+				scaledImageSize.width = containerRect.width;
+				scaledImageSize.height = containerRect.width / naturalAspect;
 			}
 
 			imageSize = {
 				...scaledImageSize,
+				// CSS margin:auto centers vertically for oversized absolutely positioned
+				// elements, but NOT horizontally (in LTR, margin-left is forced to 0).
+				// So we only need an explicit left offset for horizontal centering.
+				left: (containerRect.width - scaledImageSize.width) / 2,
+				top: 0,
 				naturalWidth: imageEl.naturalWidth,
 				naturalHeight: imageEl.naturalHeight
 			};
@@ -297,20 +298,68 @@
 	// Actions
 	// ------------------------------
 
+	export function handleKeyDown(e: KeyboardEvent) {
+		if (preview) return;
+		if (!cropperSize) return;
+
+		const panStep = e.shiftKey ? 50 : 10;
+		const zoomStep = 0.1;
+		let handled = true;
+
+		switch (e.key) {
+			case 'ArrowLeft':
+				crop = restrictPosition
+					? restrict({ x: crop.x + panStep, y: crop.y }, imageSize, cropperSize, zoom)
+					: { x: crop.x + panStep, y: crop.y };
+				break;
+			case 'ArrowRight':
+				crop = restrictPosition
+					? restrict({ x: crop.x - panStep, y: crop.y }, imageSize, cropperSize, zoom)
+					: { x: crop.x - panStep, y: crop.y };
+				break;
+			case 'ArrowUp':
+				crop = restrictPosition
+					? restrict({ x: crop.x, y: crop.y + panStep }, imageSize, cropperSize, zoom)
+					: { x: crop.x, y: crop.y + panStep };
+				break;
+			case 'ArrowDown':
+				crop = restrictPosition
+					? restrict({ x: crop.x, y: crop.y - panStep }, imageSize, cropperSize, zoom)
+					: { x: crop.x, y: crop.y - panStep };
+				break;
+			case '+':
+			case '=':
+				zoom = Math.min(maxZoom, zoom + zoomStep);
+				crop = restrictPosition ? restrict(crop, imageSize, cropperSize, zoom) : crop;
+				break;
+			case '-':
+				zoom = Math.max(minZoom, zoom - zoomStep);
+				crop = restrictPosition ? restrict(crop, imageSize, cropperSize, zoom) : crop;
+				break;
+			default:
+				handled = false;
+		}
+
+		if (handled) {
+			e.preventDefault();
+			onchange?.({ crop, zoom });
+		}
+	}
+
 	function container(el: HTMLDivElement) {
 		el.addEventListener('mousedown', containerMouseDown);
 		el.addEventListener('touchstart', containerTouchStart, { passive: false });
 		el.addEventListener('wheel', containerWheel, { passive: false });
-		el.addEventListener('guesturestart', preventZoomSafari);
-		el.addEventListener('guesturechange', preventZoomSafari);
+		el.addEventListener('gesturestart', preventZoomSafari);
+		el.addEventListener('gesturechange', preventZoomSafari);
 
 		return {
 			destroy() {
 				el.removeEventListener('mousedown', containerMouseDown);
 				el.removeEventListener('touchstart', containerTouchStart);
 				el.removeEventListener('wheel', containerWheel);
-				el.removeEventListener('guesturestart', preventZoomSafari);
-				el.removeEventListener('guesturechange', preventZoomSafari);
+				el.removeEventListener('gesturestart', preventZoomSafari);
+				el.removeEventListener('gesturechange', preventZoomSafari);
 			}
 		};
 	}
@@ -329,15 +378,17 @@
 		};
 	}
 
-	// Clean up document event listeners
+	// Clean up document event listeners and pending RAF frames
 	$effect(() => {
 		return () => {
 			cleanDocumentEvents();
+			if (rafDragTimeout) cancelAnimationFrame(rafDragTimeout);
+			if (rafZoomTimeout) cancelAnimationFrame(rafZoomTimeout);
 		};
 	});
 
 	$effect(() => {
-		if (aspect) {
+		if (effectiveAspect) {
 			untrack(() => computeSizes());
 		}
 	});
@@ -358,7 +409,7 @@
 			position,
 			imageSize,
 			cropperSize,
-			computedAspect,
+			effectiveAspect,
 			zoom,
 			restrictPosition
 		);
@@ -425,33 +476,91 @@
 	}
 </script>
 
-<svelte:window onresize={computeSizes} />
+<svelte:window onresize={() => requestAnimationFrame(computeSizes)} />
 
-<div
-	class="absolute inset-0 overflow-hidden select-none touch-none !cursor-move"
-	bind:this={containerEl}
-	use:container
-	role="button"
-	data-testid="container"
->
+<div data-ek-cropper bind:this={containerEl} use:container data-testid="container">
 	<div
-		class="absolute inline inset-0 will-change-transform m-auto"
+		data-ek-cropper-wrapper
 		style:width="{imageSize.width}px"
 		style:height="{imageSize.height}px"
 		style:left="{imageSize.left}px"
 		style:top="{imageSize.top}px"
 		style="transform: translate({crop.x}px, {crop.y}px) scale({zoom})"
 	>
-		<img class="w-full h-full" {src} alt="" bind:this={imageEl} use:image />
+		<img data-ek-cropper-image {src} alt="" bind:this={imageEl} use:image />
 	</div>
 	{#if cropperSize && !preview}
 		<div
-			class={[
-				"absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 box-border text-black/50 overflow-hidden before:content-[''] before:box-border before:border-x-1 before:border-y-0 before:border-white/50 before:absolute before:inset-y-0 before:inset-x-1/3 after:content-[''] after:box-border after:border-x-0 after:border-y-1 after:border-white/50 after:absolute after:inset-y-1/3 after:inset-x-0 [&.crop-round]:rounded-full",
-				cropShape === 'round' && 'rounded-full'
-			]}
+			data-ek-crop-overlay
+			data-ek-crop-shape={cropShape}
 			style:width="{cropperSize.width}px"
 			style:height="{cropperSize.height}px"
 		></div>
 	{/if}
 </div>
+
+<style>
+	:global([data-ek-cropper]) {
+		position: absolute;
+		inset: 0;
+		overflow: hidden;
+		user-select: none;
+		touch-action: none;
+		cursor: move;
+	}
+
+	:global([data-ek-cropper-wrapper]) {
+		position: absolute;
+		display: inline;
+		inset: 0;
+		will-change: transform;
+		margin: auto;
+	}
+
+	:global([data-ek-cropper-image]) {
+		width: 100%;
+		height: 100%;
+	}
+
+	:global([data-ek-crop-overlay]) {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		box-sizing: border-box;
+		color: var(--ek-crop-overlay-color, rgba(0, 0, 0, 0.5));
+		overflow: hidden;
+	}
+
+	:global([data-ek-crop-overlay]::before) {
+		content: '';
+		box-sizing: border-box;
+		border-left: var(--ek-crop-grid-width, 1px) solid
+			var(--ek-crop-grid-color, rgba(255, 255, 255, 0.5));
+		border-right: var(--ek-crop-grid-width, 1px) solid
+			var(--ek-crop-grid-color, rgba(255, 255, 255, 0.5));
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: 33.333%;
+		right: 33.333%;
+	}
+
+	:global([data-ek-crop-overlay]::after) {
+		content: '';
+		box-sizing: border-box;
+		border-top: var(--ek-crop-grid-width, 1px) solid
+			var(--ek-crop-grid-color, rgba(255, 255, 255, 0.5));
+		border-bottom: var(--ek-crop-grid-width, 1px) solid
+			var(--ek-crop-grid-color, rgba(255, 255, 255, 0.5));
+		position: absolute;
+		top: 33.333%;
+		bottom: 33.333%;
+		left: 0;
+		right: 0;
+	}
+
+	:global([data-ek-crop-overlay][data-ek-crop-shape='round']) {
+		border-radius: 50%;
+	}
+</style>

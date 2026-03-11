@@ -1,36 +1,35 @@
-import type { Editor } from '@tiptap/core';
-import type { Component } from 'svelte';
+import type { Variant } from './types.js';
 
-export type EditorContentProps = {
-	editor: EditorComponent;
-	editing: boolean;
-} & EditorComponentProps;
+export type { TextEditorOptions } from './types.js';
 
-export type EditorComponentProps = {
-	content: string;
-	oncreate?: (editor: Editor) => void;
-	ondestroy?: (editor: Editor | null) => void;
-	onfocus?: (editor: Editor) => void;
-};
+export * from './types.js';
 
-export type EditorContent =
-	| {
-			type: 'text';
-			content: string;
-	  }
-	| {
-			type: 'image';
-			content: null | Blob;
-	  };
-export type EditorGetContentFn = () => Promise<EditorContent>;
-export type EditorComponent = ReturnType<
-	Component<any, { getContent: EditorGetContentFn; setContent: () => Promise<void> }>
->;
+const cache = new Map<
+	Variant,
+	Promise<
+		[
+			typeof import('@tiptap/core'),
+			typeof import('./editor.svelte'),
+			{ extensions: import('@tiptap/core').Extensions }
+		]
+	>
+>();
 
-export function importEditor() {
-	return Promise.all([
-		import('@tiptap/core'),
-		import('./editor.svelte'),
-		import('./extensions.js')
-	]);
+export function importEditor(variant: Variant) {
+	if (!cache.has(variant)) {
+		const ext = resolveExtensions(variant);
+		cache.set(variant, Promise.all([import('@tiptap/core'), import('./editor.svelte'), ext]));
+	}
+	return cache.get(variant)!;
+}
+
+function resolveExtensions(variant: Variant) {
+	switch (variant) {
+		case 'plain':
+			return import('./extensions-plain.js');
+		case 'multiline':
+			return import('./extensions-multiline.js');
+		case 'rich':
+			return import('./extensions-rich.js');
+	}
 }

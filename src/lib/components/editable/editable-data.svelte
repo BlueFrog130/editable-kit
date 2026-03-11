@@ -1,32 +1,39 @@
 <script lang="ts" generics="T extends EditorData">
-	import { untrack, type Snippet } from 'svelte';
-	import { PlainText as PlainTextComponent } from '../plain-text/index.js';
-	import { MultilinePlainText as MultilinePlainTextComponent } from '../multiline-plain-text/index.js';
-	import { Rich as RichComponent } from '../rich/index.js';
-	import type { EditorComponentProps, EditorContent } from '../editor/index.js';
+	import { type Snippet } from 'svelte';
+	import { TextEditor } from '../text-editor/index.js';
+	import type { EditorComponentProps, EditorContent, TextEditorOptions } from '../editor/index.js';
 	import Image from '../image/image.svelte';
-	import type { EditorData, EditorSaveData, ImageState, MaybePromise } from '$lib/types.js';
+	import type {
+		EditorData,
+		EditorSaveData,
+		ImageKeys,
+		ImageState,
+		MaybePromise,
+		JSONKeys
+	} from '$lib/types.js';
+	import type { ProseMirrorJSON } from '$lib/types/prosemirror.js';
+	import type { NodeOverrides } from '../renderer/types.js';
 	import { SvelteMap } from 'svelte/reactivity';
 	import { getEditableContext } from './editable-context.svelte.js';
 	import type { ImageProps } from '../image/index.js';
 
-	type Get<TVal> = (data: T) => TVal;
-	type Set<TVal> = (data: T, value: TVal) => void;
+	type JSONSelector = JSONKeys<T>;
+	type ImageSelector = ImageKeys<T>;
+	type Selector = JSONSelector | ImageSelector;
 
-	type StringSelector = [Get<string>, Set<string>];
-	type ImageSelector = [Get<ImageState>, Set<ImageState>];
-	type Selector = Get<string> | Get<ImageState>;
-
-	type TextEditorSnippet = Snippet<[StringSelector]>;
+	type TextEditorSnippet = Snippet<
+		[selector: JSONSelector, options?: TextEditorOptions, ariaLabel?: string]
+	>;
 
 	type EditorRegistration = {
 		getContent: () => Promise<EditorContent>;
-		setContent: () => Promise<void>;
 	};
 
 	type Props = {
+		key: string;
 		data: T;
-		// onsave: (data: EditorSaveData<T>) => MaybePromise<void>;
+		overrides?: NodeOverrides;
+		onsave?: (data: EditorSaveData<T>) => MaybePromise<void>;
 		children?: Snippet<
 			[
 				{
@@ -35,8 +42,9 @@
 					rich: TextEditorSnippet;
 					image: Snippet<
 						[
-							ImageSelector,
-							{ maxWidth: number; maxHeight: number; quality: number; aspect: number }
+							selector: ImageSelector,
+							options: { maxWidth: number; maxHeight: number; quality: number; aspect?: number },
+							ariaLabel?: string
 						]
 					>;
 				}
@@ -44,9 +52,7 @@
 		>;
 	};
 
-	let { data: _data, children }: Props = $props();
-
-	const data = $state(structuredClone(_data));
+	let { key, data, overrides, onsave, children }: Props = $props();
 
 	const ctx = getEditableContext();
 
@@ -56,7 +62,7 @@
 		let unregister: () => void;
 
 		if (ctx.editing) {
-			unregister = ctx.register({
+			unregister = ctx.register(key, {
 				save
 			});
 		}
@@ -66,9 +72,9 @@
 		};
 	});
 
-	const editorProps = (get: StringSelector[0]): EditorComponentProps => {
+	const editorProps = (key: JSONSelector): EditorComponentProps => {
 		return {
-			content: get(data),
+			content: data[key] as ProseMirrorJSON,
 			onfocus: (e) => {
 				if (!ctx.state) return;
 				ctx.state.active = {
@@ -80,13 +86,13 @@
 	};
 
 	const imageProps = (
-		get: ImageSelector[0],
-		options: { maxWidth: number; maxHeight: number; quality: number; aspect: number }
+		key: ImageSelector,
+		options: { maxWidth: number; maxHeight: number; quality: number; aspect?: number }
 	): Pick<
 		ImageProps,
 		'src' | 'alt' | 'onfocus' | 'maxWidth' | 'maxHeight' | 'quality' | 'aspect'
 	> => {
-		const d = get(data);
+		const d = data[key] as ImageState;
 
 		return {
 			src: d.src,
@@ -103,61 +109,76 @@
 	};
 
 	async function save() {
-		await Promise.all(
-			components.values().map(async (component) => {
-				component?.setContent();
+		const entries = await Promise.all(
+			[...components.entries()].map(async ([selector, component]) => {
+				if (!component) return;
+				const content = await component.getContent();
+				return [selector, content] as const;
 			})
 		);
 
-		console.log(data);
+		const result = Object.fromEntries(
+			entries.filter((e): e is NonNullable<typeof e> => Boolean(e))
+		) as EditorSaveData<T>;
+
+		await onsave?.(result);
+
+		return result;
 	}
 </script>
 
-{#snippet text([get, set]: StringSelector)}
-	<PlainTextComponent
-		bind:editor={() => components.get(get)!, (e) => components.set(get, e)}
-		{...editorProps(get)}
+{#snippet text(key: JSONSelector, options?: TextEditorOptions, ariaLabel?: string)}
+	<TextEditor
+		bind:editor={() => components.get(key)!, (e) => components.set(key, e)}
+		{...editorProps(key)}
 		editing={ctx.editing}
-		bind:content={() => get(data), (v) => set(data, v)}
+		variant="plain"
+		textEditorOptions={options}
+		aria-label={ariaLabel}
+		{overrides}
 	/>
 {/snippet}
 
-{#snippet multiline([get, set]: StringSelector)}
-	<MultilinePlainTextComponent
-		bind:editor={() => components.get(get)!, (e) => components.set(get, e)}
-		{...editorProps(get)}
+{#snippet multiline(key: JSONSelector, options?: TextEditorOptions, ariaLabel?: string)}
+	<TextEditor
+		bind:editor={() => components.get(key)!, (e) => components.set(key, e)}
+		{...editorProps(key)}
 		editing={ctx.editing}
-		bind:content={() => get(data), (v) => set(data, v)}
+		variant="multiline"
+		textEditorOptions={options}
+		aria-label={ariaLabel}
+		{overrides}
 	/>
 {/snippet}
 
-{#snippet rich([get, set]: StringSelector)}
-	<RichComponent
-		bind:editor={() => components.get(get)!, (e) => components.set(get, e)}
-		{...editorProps(get)}
+{#snippet rich(key: JSONSelector, options?: TextEditorOptions, ariaLabel?: string)}
+	<TextEditor
+		bind:editor={() => components.get(key)!, (e) => components.set(key, e)}
+		{...editorProps(key)}
 		editing={ctx.editing}
-		bind:content={() => get(data), (v) => set(data, v)}
+		variant="rich"
+		textEditorOptions={options}
+		aria-label={ariaLabel}
+		{overrides}
 	/>
 {/snippet}
 
 {#snippet image(
-	[get, set]: ImageSelector,
-	options: { maxWidth: number; maxHeight: number; quality: number; aspect: number }
+	key: ImageSelector,
+	options: { maxWidth: number; maxHeight: number; quality: number; aspect?: number },
+	ariaLabel?: string
 )}
 	<Image
-		bind:editor={() => components.get(get)!, (e) => components.set(get, e)}
-		{...imageProps(get, options)}
+		bind:editor={() => components.get(key)!, (e) => components.set(key, e)}
+		{...imageProps(key, options)}
 		editing={ctx.editing}
+		aria-label={ariaLabel}
 	/>
 {/snippet}
 
-{#snippet content()}
-	{@render children?.({
-		text,
-		multiline,
-		rich,
-		image
-	})}
-{/snippet}
-
-{@render content()}
+{@render children?.({
+	text,
+	multiline,
+	rich,
+	image
+})}

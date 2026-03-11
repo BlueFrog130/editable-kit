@@ -6,20 +6,30 @@
 		alt = $bindable(),
 		editor = $bindable(),
 		editing,
+		'aria-label': ariaLabel,
+		class: className,
 		...props
 	}: ImageProps = $props();
 </script>
 
 {#snippet img()}
-	<img class="w-full h-full" {src} {alt} />
+	<img data-ek-image {src} {alt} class={className} />
 {/snippet}
 
 {#if editing}
-	{#await Promise.all([import('./image-editor.svelte'), import('$lib/components/editable/editable-state.svelte.js')])}
+	{#await import('./image-editor.svelte')}
 		{@render img()}
-	{:then [{ default: ImageEditor }]}
-		<ImageEditor bind:this={editor} {src} {...props} />
+	{:then { default: ImageEditor }}
+		<ImageEditor bind:this={editor} {src} {alt} aria-label={ariaLabel} {...props} />
 	{/await}
 {:else}
 	{@render img()}
 {/if}
+
+<style>
+	:global([data-ek-image]) {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+</style>

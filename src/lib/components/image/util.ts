@@ -1,25 +1,6 @@
 import type { Size, ImageSize, Point } from './types.js';
 
 /**
- * Compute the dimension of the crop area based on image size and aspect ratio
- * @param imgWidth width of the src image in pixels
- * @param imgHeight height of the src image in pixels
- * @param aspect aspect ratio of the crop
- */
-export function getCropSize(imgWidth: number, imgHeight: number, aspect: number) {
-	if (imgWidth >= imgHeight * aspect) {
-		return {
-			width: imgHeight * aspect,
-			height: imgHeight
-		};
-	}
-	return {
-		width: imgWidth,
-		height: imgWidth / aspect
-	};
-}
-
-/**
  * Ensure a new image position stays in the crop area.
  * @param position new x/y position requested for the image
  * @param imageSize width/height of the src image

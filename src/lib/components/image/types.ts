@@ -17,13 +17,9 @@ export type Point = {
 	y: number;
 };
 
-export type CropArea = {
-	x: number;
-	y: number;
-	width: number;
-	height: number;
-};
-
 export type FocusUtils = {
 	replaceImage: () => void;
+	setImageSrc: (src: string) => void;
+	getAlt: () => string;
+	setAlt: (alt: string) => void;
 };

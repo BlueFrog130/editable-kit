@@ -1,23 +1,33 @@
 <script lang="ts">
 	import type { FocusUtils, Point } from './types.js';
 	import Cropper from './cropper.svelte';
+	import type { Snippet } from 'svelte';
+	import type { ClassValue } from 'svelte/elements';
 
 	let {
+		class: _className,
 		src = $bindable(),
+		alt = $bindable(''),
 		maxWidth,
 		maxHeight,
 		aspect,
 		quality,
 		onchange,
-		onfocus
+		onfocus,
+		placeholder,
+		'aria-label': ariaLabel
 	}: {
+		class?: ClassValue;
 		src: string;
-		aspect: number;
+		alt: string;
+		aspect?: number;
 		maxWidth?: number;
 		maxHeight?: number;
 		quality?: number;
 		onchange?: (data: { crop: Point; zoom: number }) => void;
 		onfocus?: (e: FocusUtils) => void;
+		placeholder?: Snippet<[typeof replaceImage]>;
+		'aria-label'?: string;
 	} = $props();
 
 	let editing = $state(false);
@@ -37,10 +47,19 @@
 		el.focus();
 	}
 
+	function setImageSrc(value: string) {
+		src = value;
+		touched = false;
+		el.focus();
+	}
+
 	function onFocus() {
 		editing = true;
 		onfocus?.({
-			replaceImage
+			replaceImage,
+			setImageSrc,
+			getAlt: () => alt,
+			setAlt: (value: string) => (alt = value)
 		});
 	}
 
@@ -60,26 +79,39 @@
 	}
 
 	export async function getContent() {
-		if (!touched || !cropper)
+		if (touched && cropper) {
 			return {
-				type: 'image' as const,
-				content: null
+				type: 'image-blob' as const,
+				blob: await cropper.blob(),
+				alt
 			};
+		}
 		return {
-			type: 'image' as const,
-			content: await cropper.blob()
+			type: 'image-src' as const,
+			src,
+			alt
 		};
 	}
 
-	export async function setContent() {}
+	export async function syncContent() {}
 </script>
+
+{#snippet defaultImagePlaceholder()}
+	<label data-ek-image-placeholder>
+		<input data-ek-sr-only type="file" accept="image/*" onchange={insertFile} />
+		<p>Image</p>
+	</label>
+{/snippet}
 
 <button
 	bind:this={el}
-	class="w-full h-full [&.editing]:ring-1 hover:ring-1 ring-[#39f] group relative"
-	class:editing
+	data-ek-image-editor
+	data-state={editing ? 'editing' : undefined}
+	aria-label={ariaLabel}
+	aria-roledescription="image editor"
 	onfocusin={onFocus}
 	onmousedown={(e) => e.currentTarget.focus()}
+	onkeydown={(e) => cropper?.handleKeyDown(e)}
 	onfocusout={outFocus}
 >
 	{#if src}
@@ -94,10 +126,44 @@
 			{quality}
 			{onchange}
 		/>
+	{:else if placeholder}
+		{@render placeholder(replaceImage)}
 	{:else}
-		<label class="grid place-content-center w-full h-full bg-gray cursor-pointer">
-			<input class="sr-only" type="file" accept="image/*" onchange={insertFile} />
-			<p>Image</p>
-		</label>
+		{@render defaultImagePlaceholder()}
 	{/if}
 </button>
+
+<style>
+	:global([data-ek-image-editor]) {
+		width: 100%;
+		height: 100%;
+		position: relative;
+	}
+
+	:global([data-ek-image-editor]:hover),
+	:global([data-ek-image-editor][data-state='editing']) {
+		box-shadow: 0 0 0 var(--ek-focus-ring-width, 1px) var(--ek-focus-ring-color, #39f);
+	}
+
+	:global([data-ek-image-placeholder]) {
+		display: grid;
+		place-content: center;
+		width: 100%;
+		height: 100%;
+		cursor: pointer;
+		color: var(--ek-image-placeholder-color, currentColor);
+		background: var(--ek-image-placeholder-bg, transparent);
+	}
+
+	:global([data-ek-sr-only]) {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		padding: 0;
+		margin: -1px;
+		overflow: hidden;
+		clip: rect(0, 0, 0, 0);
+		white-space: nowrap;
+		border-width: 0;
+	}
+</style>
