@@ -1,7 +1,7 @@
 {
 	"name": "editable-kit",
 	"packageManager": "pnpm@10.32.1",
-	"version": "0.2.0",
+	"version": "0.2.1",
 	"description": "Svelte 5 component library for inline editing — editable text, rich text (TipTap), and images with cropping",
 	"keywords": [
 		"svelte",
