@@ -1,6 +1,32 @@
 {
 	"name": "editable-kit",
 	"version": "0.1.1",
+	"description": "Svelte 5 component library for inline editing — editable text, rich text (TipTap), and images with cropping",
+	"keywords": [
+		"svelte",
+		"svelte5",
+		"sveltekit",
+		"inline-editing",
+		"contenteditable",
+		"rich-text",
+		"tiptap",
+		"wysiwyg",
+		"image-editor",
+		"image-cropping",
+		"component-library",
+		"editable",
+		"prosemirror"
+	],
+	"author": "BlueFrog130",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/BlueFrog130/editable-kit.git"
+	},
+	"homepage": "https://github.com/BlueFrog130/editable-kit",
+	"bugs": {
+		"url": "https://github.com/BlueFrog130/editable-kit/issues"
+	},
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build && npm run package",
