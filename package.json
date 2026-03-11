@@ -40,7 +40,7 @@
 		"lint": "prettier --check .",
 		"format": "prettier --write .",
 		"changeset": "changeset",
-		"release": "pnpm lint && pnpm check && pnpm test run && pnpm package && npm publish --provenance --access public"
+		"release": "pnpm lint && pnpm check && pnpm test run && pnpm package && npm publish --access public"
 	},
 	"exports": {
 		".": {
