@@ -275,9 +275,9 @@
 	<p class="mt-3 mb-4 text-sm text-muted-foreground">
 		The <code class="rounded bg-muted px-1.5 py-0.5 font-mono text-sm">Editable.Data</code>
 		component accepts the same
-		<code class="rounded bg-muted px-1.5 py-0.5 font-mono text-sm">overrides</code> prop. When not
-		editing, the component uses the Renderer internally — your overrides apply to both the read-only
-		display and the loading state while TipTap initializes.
+		<code class="rounded bg-muted px-1.5 py-0.5 font-mono text-sm">overrides</code> prop. When not editing,
+		the component uses the Renderer internally — your overrides apply to both the read-only display and
+		the loading state while TipTap initializes.
 	</p>
 
 	{#snippet editableHeading(
@@ -352,8 +352,8 @@
 			</li>
 			<li>
 				When <code class="rounded bg-muted px-1.5 py-0.5 font-mono text-sm">editing</code> becomes
-				<code class="rounded bg-muted px-1.5 py-0.5 font-mono text-sm">true</code>, TipTap loads
-				and replaces the rendered output — overrides are shown during the loading state
+				<code class="rounded bg-muted px-1.5 py-0.5 font-mono text-sm">true</code>, TipTap loads and
+				replaces the rendered output — overrides are shown during the loading state
 			</li>
 			<li>
 				Define overrides once and pass them to <code
@@ -376,8 +376,8 @@
 		>
 		snippet you must render. Leaf nodes like
 		<code class="rounded bg-muted px-1.5 py-0.5 font-mono text-sm">image</code>
-		and <code class="rounded bg-muted px-1.5 py-0.5 font-mono text-sm">hardBreak</code> only receive
-		the node data.
+		and <code class="rounded bg-muted px-1.5 py-0.5 font-mono text-sm">hardBreak</code> only receive the
+		node data.
 	</p>
 	<p class="mb-6 text-sm text-muted-foreground">
 		Pass node overrides via <code class="rounded bg-muted px-1.5 py-0.5 font-mono text-sm"
@@ -398,8 +398,7 @@
 				<code class="font-mono text-foreground">heading</code>
 				<span
 					>Has <code class="font-mono">attrs.level</code> (1-3). Default:
-					<code class="font-mono">&lt;h1&gt;</code>-<code class="font-mono">&lt;h3&gt;</code
-					></span
+					<code class="font-mono">&lt;h1&gt;</code>-<code class="font-mono">&lt;h3&gt;</code></span
 				>
 			</div>
 			<div class="grid grid-cols-[8rem_1fr] gap-2">
@@ -445,8 +444,8 @@
 	<h2 class="font-serif text-2xl tracking-tight">Mark Override Signatures</h2>
 	<p class="mt-3 mb-4 text-sm text-muted-foreground">
 		Mark overrides customize how inline formatting is rendered. Each receives the mark data and a
-		<code class="rounded bg-muted px-1.5 py-0.5 font-mono text-sm">children</code> snippet for the
-		wrapped content. Marks can be nested (e.g. bold inside a link), so always render the children snippet.
+		<code class="rounded bg-muted px-1.5 py-0.5 font-mono text-sm">children</code> snippet for the wrapped
+		content. Marks can be nested (e.g. bold inside a link), so always render the children snippet.
 	</p>
 	<p class="mb-6 text-sm text-muted-foreground">
 		Pass mark overrides via <code class="rounded bg-muted px-1.5 py-0.5 font-mono text-sm"
