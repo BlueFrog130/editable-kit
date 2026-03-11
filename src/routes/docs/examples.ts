@@ -278,6 +278,125 @@ export const RENDERER_OVERRIDES = `{#snippet heading(node, children)}
 
 <Renderer doc={post.body} overrides={{ nodes: { heading }, marks: { link } }} />`;
 
+export const RENDERER_NODE_SIGNATURES = `<!-- Each node snippet receives the node data and a children snippet -->
+<!-- Nodes with children: paragraph, heading, blockquote, bulletList, orderedList, listItem -->
+{#snippet paragraph(node: ParagraphNode, children: Snippet)}
+  <p class="my-custom-class">{@render children()}</p>
+{/snippet}
+
+{#snippet heading(node: HeadingNode, children: Snippet)}
+  <!-- node.attrs.level is 1 | 2 | 3 -->
+  <svelte:element this={\`h\${node.attrs.level}\`}>
+    {@render children()}
+  </svelte:element>
+{/snippet}
+
+{#snippet blockquote(node: BlockquoteNode, children: Snippet)}
+  <blockquote class="border-l-4 pl-4">{@render children()}</blockquote>
+{/snippet}
+
+{#snippet bulletList(node: BulletListNode, children: Snippet)}
+  <ul class="list-disc pl-6">{@render children()}</ul>
+{/snippet}
+
+{#snippet orderedList(node: OrderedListNode, children: Snippet)}
+  <!-- node.attrs?.start for custom start number -->
+  <ol start={node.attrs?.start} class="list-decimal pl-6">{@render children()}</ol>
+{/snippet}
+
+{#snippet listItem(node: ListItemNode, children: Snippet)}
+  <li>{@render children()}</li>
+{/snippet}
+
+<!-- Leaf nodes (no children snippet) -->
+{#snippet image(node: ImageNode)}
+  <img src={node.attrs.src} alt={node.attrs.alt ?? ''} title={node.attrs.title} />
+{/snippet}
+
+{#snippet hardBreak(node: HardBreakNode)}
+  <br />
+{/snippet}`;
+
+export const RENDERER_MARK_SIGNATURES = `<!-- Each mark snippet receives the mark data and a children snippet -->
+{#snippet bold(mark: BoldMark, children: Snippet)}
+  <strong class="font-bold">{@render children()}</strong>
+{/snippet}
+
+{#snippet italic(mark: ItalicMark, children: Snippet)}
+  <em>{@render children()}</em>
+{/snippet}
+
+{#snippet underline(mark: UnderlineMark, children: Snippet)}
+  <u>{@render children()}</u>
+{/snippet}
+
+{#snippet strike(mark: StrikeMark, children: Snippet)}
+  <s>{@render children()}</s>
+{/snippet}
+
+{#snippet link(mark: LinkMark, children: Snippet)}
+  <!-- mark.attrs: { href, target?, rel?, class? } -->
+  <a href={mark.attrs.href} target={mark.attrs.target} rel={mark.attrs.rel}>
+    {@render children()}
+  </a>
+{/snippet}`;
+
+export const RENDERER_EDITABLE_DATA = `<script lang="ts">
+  import * as Editable from 'editable-kit';
+  import type { ProseMirrorJSON } from 'editable-kit';
+
+  type Post = {
+    title: ProseMirrorJSON;
+    body: ProseMirrorJSON;
+  };
+
+  let data: Post = $state({
+    title: { type: 'doc', content: [{ type: 'text', text: 'My Post Title' }] },
+    body: {
+      type: 'doc',
+      content: [
+        {
+          type: 'paragraph',
+          content: [{ type: 'text', text: 'Rich text body content.' }]
+        }
+      ]
+    }
+  });
+
+  let editing = $state(false);
+
+  // Define overrides once — they apply to both read-only and editing views
+  const overrides = {
+    nodes: { heading },
+    marks: { link }
+  };
+</script>
+
+<!-- Define snippet overrides -->
+{#snippet heading(node, children)}
+  <h1 class="text-3xl font-bold tracking-tight">
+    {@render children()}
+  </h1>
+{/snippet}
+
+{#snippet link(mark, children)}
+  <a href={mark.attrs.href} class="text-blue-600 underline">
+    {@render children()}
+  </a>
+{/snippet}
+
+<!-- Pass overrides to Editable.Data -->
+<Editable.Root {editing}>
+  {#snippet children({ save })}
+    <Editable.Data key="post" {data} {overrides} onsave={(d) => data = { ...data, ...d }}>
+      {#snippet children({ text, rich })}
+        {@render text('title')}
+        {@render rich('body')}
+      {/snippet}
+    </Editable.Data>
+  {/snippet}
+</Editable.Root>`;
+
 // Low-Level Editors page
 export const LOW_LEVEL_STANDALONE = `<script lang="ts">
   import { PlainText, RichText } from 'editable-kit/editors';
