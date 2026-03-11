@@ -8,7 +8,7 @@ export const GETTING_STARTED = `<script lang="ts">
     image: ImageState;
   };
 
-  let data: PageData = $state({ ... });
+  let data: PageData = $state({} as PageData); // your data here
   let editing = $state(false);
 
   async function handleSave(allData) {
@@ -52,7 +52,7 @@ export const CORE_CONCEPTS = `<script lang="ts">
     image: ImageState;
   };
 
-  let data: PageData = $state({ ... });
+  let data: PageData = $state({} as PageData); // your data here
   let editing = $state(false);
 </script>
 
@@ -311,8 +311,8 @@ export const LOW_LEVEL_WITH_ROOT = `<script lang="ts">
   import type { ProseMirrorJSON } from 'editable-kit';
 
   let editing = $state(false);
-  let title: ProseMirrorJSON = $state({ ... });
-  let body: ProseMirrorJSON = $state({ ... });
+  let title: ProseMirrorJSON = $state({} as ProseMirrorJSON); // your data here
+  let body: ProseMirrorJSON = $state({} as ProseMirrorJSON); // your data here
 
   async function handleSave(allData) {
     // Standalone editors register with their key
