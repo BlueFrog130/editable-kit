@@ -106,11 +106,7 @@ function createTurndown() {
 		filter(node) {
 			if (node.nodeName === 'BUTTON') return true;
 			// Remove separator divs
-			if (
-				node.nodeName === 'DIV' &&
-				node.getAttribute('data-slot') === 'separator'
-			)
-				return true;
+			if (node.nodeName === 'DIV' && node.getAttribute('data-slot') === 'separator') return true;
 			// Remove tab triggers (pnpm/npm/yarn/bun tabs) — keep only content
 			if (node.getAttribute('data-tabs-trigger') !== null) return true;
 			// Remove inactive tab content
@@ -185,9 +181,7 @@ function generateLlmsTxt() {
 			}
 			const html = readFileSync(filePath, 'utf-8');
 			const description = extractDescription(html);
-			const url = item.slug
-				? `${BASE_URL}/docs/${item.slug}`
-				: `${BASE_URL}/docs`;
+			const url = item.slug ? `${BASE_URL}/docs/${item.slug}` : `${BASE_URL}/docs`;
 			lines.push(`- [${item.label}](${url}): ${description}`);
 		}
 		lines.push('');
