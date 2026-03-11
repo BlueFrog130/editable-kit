@@ -34,9 +34,7 @@ export function verifySessionToken(token: string): string | null {
 	if (!crypto.timingSafeEqual(sigBuf, expectedBuf)) return null;
 
 	try {
-		const payload: SessionPayload = JSON.parse(
-			Buffer.from(encoded, 'base64url').toString()
-		);
+		const payload: SessionPayload = JSON.parse(Buffer.from(encoded, 'base64url').toString());
 		if (payload.exp < Date.now()) return null;
 		return payload.user;
 	} catch {

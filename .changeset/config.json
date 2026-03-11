@@ -1,9 +1,6 @@
 {
 	"$schema": "https://unpkg.com/@changesets/config@3.1.1/schema.json",
-	"changelog": [
-		"@changesets/changelog-github",
-		{ "repo": "BlueFrog130/editable-kit" }
-	],
+	"changelog": ["@changesets/changelog-github", { "repo": "BlueFrog130/editable-kit" }],
 	"commit": false,
 	"fixed": [],
 	"linked": [],
