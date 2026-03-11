@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import { Renderer } from '$lib/components/renderer/index.js';
 	import type { BlogPostData } from '@routes/types.js';
 	import type { ProseMirrorJSON, PMNode } from '$lib/types/prosemirror.js';
@@ -43,7 +44,7 @@
 		</div>
 
 		{#if data.length > 0}
-			<a href="/blog/{data[0].id}" class="group/featured mb-8 block">
+			<a href={resolve('/blog/[id]', { id: data[0].id })} class="group/featured mb-8 block">
 				<article
 					class="grid overflow-hidden rounded-xl border border-border bg-card shadow-sm transition-shadow hover:shadow-md md:grid-cols-2"
 				>
@@ -81,7 +82,7 @@
 		{#if data.length > 1}
 			<div class="grid gap-6 sm:grid-cols-2">
 				{#each data.slice(1) as post, i (post.id)}
-					<a href="/blog/{post.id}" class="group/card block">
+					<a href={resolve('/blog/[id]', { id: post.id })} class="group/card block">
 						<article
 							class="h-full overflow-hidden rounded-xl border border-border bg-card shadow-sm transition-shadow hover:shadow-md"
 						>

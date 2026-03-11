@@ -1,5 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { restrictPosition, computeCroppedArea, getDistanceBetweenPoints, getCenter } from './util.js';
+import {
+	restrictPosition,
+	computeCroppedArea,
+	getDistanceBetweenPoints,
+	getCenter
+} from './util.js';
 
 describe('restrictPosition', () => {
 	const image = { width: 200, height: 100 };
@@ -84,7 +89,12 @@ describe('computeCroppedArea', () => {
 	describe('restricted path', () => {
 		it('returns full image at zoom=1, crop at origin', () => {
 			const { croppedAreaPixels, croppedAreaPercentages } = computeCroppedArea(
-				{ x: 0, y: 0 }, imgSize, cropSize, 1, 1, true
+				{ x: 0, y: 0 },
+				imgSize,
+				cropSize,
+				1,
+				1,
+				true
 			);
 			expect(croppedAreaPercentages.width).toBeCloseTo(100);
 			expect(croppedAreaPercentages.height).toBeCloseTo(100);
@@ -96,7 +106,12 @@ describe('computeCroppedArea', () => {
 
 		it('returns smaller region when zoomed in', () => {
 			const { croppedAreaPercentages } = computeCroppedArea(
-				{ x: 0, y: 0 }, imgSize, cropSize, 1, 2, true
+				{ x: 0, y: 0 },
+				imgSize,
+				cropSize,
+				1,
+				2,
+				true
 			);
 			expect(croppedAreaPercentages.width).toBeCloseTo(50);
 			expect(croppedAreaPercentages.height).toBeCloseTo(50);
@@ -104,7 +119,12 @@ describe('computeCroppedArea', () => {
 
 		it('clamps percentages to 0-100 range', () => {
 			const { croppedAreaPercentages } = computeCroppedArea(
-				{ x: 9999, y: 9999 }, imgSize, cropSize, 1, 1, true
+				{ x: 9999, y: 9999 },
+				imgSize,
+				cropSize,
+				1,
+				1,
+				true
 			);
 			expect(croppedAreaPercentages.x).toBeGreaterThanOrEqual(0);
 			expect(croppedAreaPercentages.x).toBeLessThanOrEqual(100);
@@ -116,7 +136,12 @@ describe('computeCroppedArea', () => {
 	describe('unrestricted path', () => {
 		it('allows percentages outside 0-100', () => {
 			const { croppedAreaPercentages } = computeCroppedArea(
-				{ x: 9999, y: 9999 }, imgSize, cropSize, 1, 1, false
+				{ x: 9999, y: 9999 },
+				imgSize,
+				cropSize,
+				1,
+				1,
+				false
 			);
 			expect(croppedAreaPercentages.x).toBeLessThan(0);
 		});
@@ -126,7 +151,12 @@ describe('computeCroppedArea', () => {
 		it('handles wider-than-high image (width >= height * aspect)', () => {
 			const wide = { width: 200, height: 100, naturalWidth: 400, naturalHeight: 200 };
 			const { croppedAreaPixels } = computeCroppedArea(
-				{ x: 0, y: 0 }, wide, { width: 200, height: 100 }, 2, 1, true
+				{ x: 0, y: 0 },
+				wide,
+				{ width: 200, height: 100 },
+				2,
+				1,
+				true
 			);
 			expect(croppedAreaPixels.height).toBe(200);
 			expect(croppedAreaPixels.width).toBe(200 * 2);
@@ -135,7 +165,12 @@ describe('computeCroppedArea', () => {
 		it('handles taller-than-wide image', () => {
 			const tall = { width: 100, height: 200, naturalWidth: 200, naturalHeight: 400 };
 			const { croppedAreaPixels } = computeCroppedArea(
-				{ x: 0, y: 0 }, tall, { width: 100, height: 200 }, 0.5, 1, true
+				{ x: 0, y: 0 },
+				tall,
+				{ width: 100, height: 200 },
+				0.5,
+				1,
+				true
 			);
 			expect(croppedAreaPixels.width).toBeGreaterThan(0);
 			expect(croppedAreaPixels.height).toBeGreaterThan(0);
@@ -144,7 +179,12 @@ describe('computeCroppedArea', () => {
 		it('hits taller-than-wide branch', () => {
 			const tall = { width: 50, height: 200, naturalWidth: 100, naturalHeight: 400 };
 			const { croppedAreaPixels } = computeCroppedArea(
-				{ x: 0, y: 0 }, tall, { width: 50, height: 200 }, 1, 1, true
+				{ x: 0, y: 0 },
+				tall,
+				{ width: 50, height: 200 },
+				1,
+				1,
+				true
 			);
 			expect(croppedAreaPixels.width).toBe(100);
 			expect(croppedAreaPixels.height).toBe(Math.round(100 / 1));
@@ -154,9 +194,7 @@ describe('computeCroppedArea', () => {
 	describe('boundary conditions', () => {
 		it('does not produce NaN with zero-dimension image', () => {
 			const zero = { width: 0, height: 0, naturalWidth: 0, naturalHeight: 0 };
-			const { croppedAreaPixels } = computeCroppedArea(
-				{ x: 0, y: 0 }, zero, cropSize, 1, 1, true
-			);
+			const { croppedAreaPixels } = computeCroppedArea({ x: 0, y: 0 }, zero, cropSize, 1, 1, true);
 			expect(Number.isNaN(croppedAreaPixels.width)).toBe(false);
 			expect(Number.isNaN(croppedAreaPixels.height)).toBe(false);
 		});

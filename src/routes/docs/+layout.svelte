@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
+	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import * as Sheet from '../components/ui/sheet/index.js';
 	import { Button } from '../components/ui/button/index.js';
@@ -13,37 +14,37 @@
 		{
 			category: 'Overview',
 			items: [
-				{ label: 'Introduction', href: '/docs' },
-				{ label: 'Getting Started', href: '/docs/getting-started' }
+				{ label: 'Introduction', href: resolve('/docs') },
+				{ label: 'Getting Started', href: resolve('/docs/getting-started') }
 			]
 		},
 		{
 			category: 'Guide',
 			items: [
-				{ label: 'Editors', href: '/docs/editors' },
-				{ label: 'Extensions', href: '/docs/extensions' },
-				{ label: 'Saving', href: '/docs/saving' },
-				{ label: 'Arrays & Lists', href: '/docs/arrays' },
-				{ label: 'Low-Level Editors', href: '/docs/low-level' },
-				{ label: 'Theming', href: '/docs/theming' },
-				{ label: 'Patterns', href: '/docs/patterns' }
+				{ label: 'Editors', href: resolve('/docs/editors') },
+				{ label: 'Extensions', href: resolve('/docs/extensions') },
+				{ label: 'Saving', href: resolve('/docs/saving') },
+				{ label: 'Arrays & Lists', href: resolve('/docs/arrays') },
+				{ label: 'Low-Level Editors', href: resolve('/docs/low-level') },
+				{ label: 'Theming', href: resolve('/docs/theming') },
+				{ label: 'Patterns', href: resolve('/docs/patterns') }
 			]
 		},
 		{
 			category: 'Components',
 			items: [
-				{ label: 'Toolbar', href: '/docs/toolbar' },
-				{ label: 'Renderer', href: '/docs/renderer' }
+				{ label: 'Toolbar', href: resolve('/docs/toolbar') },
+				{ label: 'Renderer', href: resolve('/docs/renderer') }
 			]
 		},
 		{
 			category: 'Reference',
-			items: [{ label: 'API Reference', href: '/docs/api' }]
+			items: [{ label: 'API Reference', href: resolve('/docs/api') }]
 		}
 	];
 
 	function isActive(href: string) {
-		if (href === '/docs') return page.url.pathname === '/docs';
+		if (href === resolve('/docs')) return page.url.pathname === resolve('/docs');
 		return page.url.pathname.startsWith(href);
 	}
 </script>
@@ -64,7 +65,7 @@
 					<span class="sr-only">Open navigation</span>
 				</Button>
 				<a
-					href="/"
+					href={resolve('/')}
 					class="flex items-center gap-1.5 text-xs tracking-[0.15em] text-muted-foreground uppercase transition-colors hover:text-foreground"
 				>
 					<span class="text-base">&larr;</span> Demo

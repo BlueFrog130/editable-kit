@@ -25,11 +25,11 @@ A portfolio site built with [editable-kit](https://github.com/adamgiebl/editable
 
    Environment variables:
 
-   | Variable        | Description                          |
-   | --------------- | ------------------------------------ |
-   | `AUTH_USERNAME`  | Admin username                       |
-   | `AUTH_PASSWORD`  | Admin password                       |
-   | `AUTH_SECRET`    | Secret key for signing session cookies (min 32 chars) |
+   | Variable        | Description                                           |
+   | --------------- | ----------------------------------------------------- |
+   | `AUTH_USERNAME` | Admin username                                        |
+   | `AUTH_PASSWORD` | Admin password                                        |
+   | `AUTH_SECRET`   | Secret key for signing session cookies (min 32 chars) |
 
 3. Start the dev server:
 
