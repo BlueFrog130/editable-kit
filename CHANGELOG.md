@@ -1,5 +1,11 @@
 # editable-kit
 
+## 0.2.2
+
+### Patch Changes
+
+- [`71a12bf`](https://github.com/BlueFrog130/editable-kit/commit/71a12bfb42876626a70637b90870a06634b88f9f) Thanks [@BlueFrog130](https://github.com/BlueFrog130)! - llms.txt and docs
+
 ## 0.2.1
 
 ### Patch Changes
