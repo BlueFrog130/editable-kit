@@ -12,6 +12,10 @@
   <img src="https://img.shields.io/badge/svelte-5-ff3e00" alt="Svelte 5">
 </p>
 
+<p align="center">
+  <a href="https://bluefrog130.github.io/editable-kit/">Live Demo</a> · <a href="https://github.com/BlueFrog130/editable-kit">GitHub</a> · <a href="https://www.npmjs.com/package/editable-kit">npm</a>
+</p>
+
 ---
 
 Turn any Svelte 5 page into an editable CMS-like experience. Drop in `<Editable.Root>` and `<Editable.Data>`, and your users can edit text, rich content, and images inline — no separate admin panel needed.
