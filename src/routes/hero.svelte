@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import * as Editable from '$lib/components/editable/index.js';
 	import type { HeroData } from '@routes/types.js';
 
@@ -28,13 +29,13 @@
 						class="mt-10 flex flex-col items-center justify-center gap-3 group-data-editing:pointer-events-none group-data-editing:opacity-50 sm:flex-row"
 					>
 						<a
-							href="/docs"
+							href={resolve('/docs')}
 							class="inline-flex h-11 items-center justify-center rounded-md bg-primary px-8 text-sm font-medium text-primary-foreground shadow-xs transition-colors hover:bg-primary/90"
 						>
 							View Documentation &rarr;
 						</a>
 						<a
-							href="/docs/getting-started"
+							href={resolve('/docs/getting-started')}
 							class="inline-flex h-11 items-center justify-center rounded-md border border-border bg-background px-8 text-sm font-medium shadow-xs transition-colors hover:bg-accent hover:text-accent-foreground"
 						>
 							Get Started

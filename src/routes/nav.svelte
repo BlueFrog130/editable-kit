@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import { Button } from '@routes/components/ui/button/index.js';
 
 	let {
@@ -44,7 +45,7 @@
 				{/if}
 				<Button variant="ghost" size="sm" onclick={onreset}>Reset</Button>
 			{:else}
-				<Button variant="ghost" size="sm" href="/docs">Docs</Button>
+				<Button variant="ghost" size="sm" href={resolve('/docs')}>Docs</Button>
 				<Button variant="ghost" size="sm" onclick={onedit}>Edit Page</Button>
 			{/if}
 		</div>

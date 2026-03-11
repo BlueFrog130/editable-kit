@@ -37,7 +37,9 @@
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"test": "vitest",
 		"lint": "prettier --check .",
-		"format": "prettier --write ."
+		"format": "prettier --write .",
+		"changeset": "changeset",
+		"release": "pnpm lint && pnpm check && pnpm test run && pnpm package && npm publish --provenance --access public"
 	},
 	"exports": {
 		".": {
@@ -66,6 +68,8 @@
 		"svelte": "^5.0.0-next.1"
 	},
 	"devDependencies": {
+		"@changesets/changelog-github": "^0.6.0",
+		"@changesets/cli": "^2.30.0",
 		"@floating-ui/dom": "^1.7.5",
 		"@internationalized/date": "^3.11.0",
 		"@lucide/svelte": "^0.575.0",

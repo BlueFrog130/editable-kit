@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import * as Editable from '$lib/components/editable/index.js';
 	import type { SaveResult } from '$lib/components/editable/types.js';
 	import * as db from '@routes/db.js';
@@ -39,14 +40,14 @@
 	async function handleDelete() {
 		if (!post) return;
 		await db.deleteBlogPost(post.id);
-		goto('/');
+		goto(resolve('/'));
 	}
 </script>
 
 {#if !post || !editableData}
 	<div class="flex min-h-screen flex-col items-center justify-center">
 		<p class="text-lg text-muted-foreground">Post not found.</p>
-		<a href="/" class="mt-4 text-sm underline underline-offset-2 hover:text-foreground">
+		<a href={resolve('/')} class="mt-4 text-sm underline underline-offset-2 hover:text-foreground">
 			Back to home
 		</a>
 	</div>
@@ -55,7 +56,7 @@
 		{#snippet children({ state, save })}
 			<Nav
 				{editing}
-				backHref="/"
+				backHref={resolve('/')}
 				onedit={() => (editing = true)}
 				onreset={() => (editing = false)}
 				ondelete={handleDelete}

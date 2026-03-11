@@ -1,3 +1,7 @@
+<script lang="ts">
+	import { resolve } from '$app/paths';
+</script>
+
 <footer class="group-data-editing:pointer-events-none group-data-editing:opacity-50">
 	<div class="border-t border-border bg-secondary/40 py-16">
 		<div class="mx-auto max-w-6xl px-6 text-center">
@@ -9,7 +13,7 @@
 			</p>
 			<div class="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
 				<a
-					href="/docs/getting-started"
+					href={resolve('/docs/getting-started')}
 					class="inline-flex h-11 items-center justify-center rounded-md bg-primary px-8 text-sm font-medium text-primary-foreground shadow-xs transition-colors hover:bg-primary/90"
 				>
 					Get Started &rarr;
