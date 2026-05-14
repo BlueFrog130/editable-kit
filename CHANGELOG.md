@@ -1,5 +1,11 @@
 # editable-kit
 
+## 0.3.0
+
+### Minor Changes
+
+- [`1c2b1bf`](https://github.com/BlueFrog130/editable-kit/commit/1c2b1bfc4fb726c37e7b5074699a152368caecb4) Thanks [@BlueFrog130](https://github.com/BlueFrog130)! - Updating deps
+
 ## 0.2.2
 
 ### Patch Changes
