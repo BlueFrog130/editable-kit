@@ -1,7 +1,6 @@
 <script lang="ts">
 	import * as Editable from '$lib/index.js';
 	import * as db from '@routes/db.js';
-	import { uploadAsDataURL } from '@routes/apply-fields.js';
 	import type { DemoSiteData } from '@routes/types.js';
 	import { createDefaultBlogPost, createDefaultNote, DEFAULT_DATA } from '@routes/defaults.js';
 	import Nav from '@routes/nav.svelte';
@@ -58,7 +57,7 @@
 
 <svelte:window onpageshow={handlePageShow} />
 
-<Editable.Root bind:data {editing} upload={uploadAsDataURL} onsave={handleSave}>
+<Editable.Root bind:data {editing} onsave={handleSave}>
 	{#snippet children({ state, save, reset })}
 		<Nav
 			{editing}

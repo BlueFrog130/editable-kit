@@ -18,7 +18,10 @@ export type TextEditorOptions = {
 
 export type Variant = 'plain' | 'multiline' | 'rich' | 'image';
 
-/** Turns a picked file into a URL the editor can point at. */
+/**
+ * Turns a picked file into a URL the editor can point at. Nothing in the library calls
+ * one — build the flow in your toolbar: `pickFile()`, your upload, then `setImage`.
+ */
 export type UploadHandler = (file: File) => Promise<string>;
 
 export type FieldProps = {
@@ -27,7 +30,6 @@ export type FieldProps = {
 	editing: boolean;
 	overrides?: NodeOverrides;
 	options?: TextEditorOptions;
-	upload?: UploadHandler;
 	onfocus?: (editor: import('@tiptap/core').Editor) => void;
 	/** Fires on blur and on image edits — not per keystroke. See `Editable.Root`. */
 	onchange?: (value: ProseMirrorJSON) => void;

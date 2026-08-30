@@ -52,13 +52,6 @@
 					>
 				</div>
 				<div class="flex gap-4">
-					<code class="w-32 shrink-0 font-mono text-foreground">upload?</code>
-					<span class="text-muted-foreground"
-						><code class="font-mono">(file: File) =&gt; Promise&lt;string&gt;</code> — Default upload
-						handler for every field inside.</span
-					>
-				</div>
-				<div class="flex gap-4">
 					<code class="w-32 shrink-0 font-mono text-foreground">overrides?</code>
 					<span class="text-muted-foreground"
 						><code class="font-mono">NodeOverrides</code> — Default render overrides for every field inside.
@@ -126,13 +119,6 @@
 						><code class="font-mono">TextEditorOptions</code> — TipTap configuration: placeholder,
 						extensions, <code class="font-mono">oncreate</code>,
 						<code class="font-mono">editorProps</code>.</span
-					>
-				</div>
-				<div class="flex gap-4">
-					<code class="w-32 shrink-0 font-mono text-foreground">upload?</code>
-					<span class="text-muted-foreground"
-						><code class="font-mono">(file: File) =&gt; Promise&lt;string&gt;</code> — Falls back to
-						<code class="font-mono">Root</code>'s handler. Required to replace images.</span
 					>
 				</div>
 				<div class="flex gap-4">

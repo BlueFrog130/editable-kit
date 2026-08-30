@@ -1,4 +1,5 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
+import { flushSync } from 'svelte';
 import { EditableState } from './editable-state.svelte.js';
 import type { Editor } from '@tiptap/core';
 
@@ -212,5 +213,103 @@ describe('EditableState', () => {
 
 			expect(fn).not.toHaveBeenCalled();
 		});
+	});
+});
+
+describe('transaction reactivity', () => {
+	afterEach(() => vi.useRealTimers());
+
+	/** Captures the handler EditableState registers, so a transaction can be simulated. */
+	function attached(isActive = vi.fn().mockReturnValue(false)) {
+		const state = new EditableState();
+		let fire!: () => void;
+		state.editor = mockEditor({
+			isActive,
+			on: vi.fn((event: string, fn: () => void) => {
+				if (event === 'transaction') fire = fn;
+			})
+		});
+		return { state, fire, isActive };
+	}
+
+	it('re-reads isActive after a transaction, so a toolbar button updates', () => {
+		vi.useFakeTimers();
+		const { state, fire, isActive } = attached();
+
+		const seen: boolean[] = [];
+		const stop = $effect.root(() => {
+			$effect(() => void seen.push(state.isActive('bold')));
+		});
+		flushSync();
+		expect(seen).toEqual([false]);
+
+		isActive.mockReturnValue(true);
+		fire(); // leading edge — bumps the version immediately
+		flushSync();
+		expect(seen).toEqual([false, true]);
+
+		stop();
+	});
+
+	// A burst of transactions (typing) must not re-run every toolbar getter per keystroke.
+	it('debounces a burst into a leading bump plus one trailing bump', () => {
+		vi.useFakeTimers();
+		const { state, fire } = attached();
+
+		let runs = 0;
+		const stop = $effect.root(() => {
+			$effect(() => {
+				state.isActive('bold');
+				runs++;
+			});
+		});
+		flushSync();
+		expect(runs).toBe(1);
+
+		for (let i = 0; i < 20; i++) fire();
+		flushSync();
+		expect(runs).toBe(2); // leading only
+
+		vi.advanceTimersByTime(200);
+		flushSync();
+		expect(runs).toBe(3); // one trailing bump for the whole burst
+
+		stop();
+	});
+
+	it('cancels a pending bump when the editor is swapped out', () => {
+		vi.useFakeTimers();
+		const { state, fire } = attached();
+
+		let runs = 0;
+		const stop = $effect.root(() => {
+			$effect(() => {
+				state.isActive('bold');
+				runs++;
+			});
+		});
+		flushSync();
+		fire();
+		fire(); // schedules a trailing bump
+		flushSync();
+		const before = runs;
+
+		state.editor = undefined;
+		flushSync();
+		const afterSwap = runs;
+
+		vi.advanceTimersByTime(1000);
+		flushSync();
+		// The trailing bump was cancelled; nothing fires after the swap settled.
+		expect(runs).toBe(afterSwap);
+		expect(afterSwap).toBeGreaterThanOrEqual(before);
+
+		stop();
+	});
+
+	it('has() is not version-tracked — the schema cannot change under one editor', () => {
+		const { state } = attached();
+		expect(state.has('bold')).toBe(true);
+		expect(state.has('nope')).toBe(false);
 	});
 });

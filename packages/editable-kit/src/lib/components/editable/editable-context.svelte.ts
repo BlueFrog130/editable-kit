@@ -1,7 +1,7 @@
 import { setContext, getContext } from 'svelte';
 import { EditableState } from './editable-state.svelte.js';
 import type { MaybePromise } from '$lib/types.js';
-import type { TextEditorOptions, UploadHandler } from '../editor/types.js';
+import type { TextEditorOptions } from '../editor/types.js';
 import type { NodeOverrides } from '../renderer/types.js';
 
 const EDITABLE_CONTEXT_KEY = Symbol('editable-context');
@@ -19,8 +19,6 @@ export type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
 /** Live view of `Root`'s props. Getters, so the context tracks them reactively. */
 export type EditableOptions = {
 	readonly editing: boolean;
-	/** Default upload handler for fields that do not pass their own. */
-	readonly upload?: UploadHandler;
 	/** Default renderer overrides. Fields merge their own over these. */
 	readonly overrides?: NodeOverrides;
 	/** Default editor options — TipTap extensions, placeholder, hooks. Fields merge over these. */
@@ -61,10 +59,6 @@ export class EditableContext {
 
 	get editing() {
 		return this.#options.editing;
-	}
-
-	get upload() {
-		return this.#options.upload;
 	}
 
 	get overrides() {

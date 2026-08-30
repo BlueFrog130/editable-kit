@@ -7,13 +7,12 @@
 	} from './editable-context.svelte.js';
 	import type { EditableState } from './editable-state.svelte.js';
 	import type { MaybePromise } from '$lib/types.js';
-	import type { TextEditorOptions, UploadHandler } from '../editor/types.js';
+	import type { TextEditorOptions } from '../editor/types.js';
 	import type { NodeOverrides } from '../renderer/types.js';
 
 	let {
 		data = $bindable(),
 		editing,
-		upload,
 		overrides,
 		options,
 		onsave,
@@ -29,8 +28,6 @@
 		 */
 		data?: T;
 		editing: boolean;
-		/** Default upload handler for every field inside. */
-		upload?: UploadHandler;
 		/** Default renderer overrides for every field inside. Fields merge their own over these. */
 		overrides?: NodeOverrides;
 		/** Default editor options for every field inside — configure TipTap extensions once here. */
@@ -59,9 +56,6 @@
 		new EditableContext({
 			get editing() {
 				return editing;
-			},
-			get upload() {
-				return upload;
 			},
 			get overrides() {
 				return overrides;

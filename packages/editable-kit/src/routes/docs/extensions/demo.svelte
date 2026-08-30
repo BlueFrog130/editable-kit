@@ -65,8 +65,8 @@
 		];
 	}
 
-	// ponytail: object URLs, so the demo needs no server. Real apps pass `upload` to the
-	// field and insert the URL it resolves to.
+	// ponytail: object URLs, so the demo needs no server. Real apps upload the file in
+	// the toolbar and insert the URL it resolves to.
 	function insert(editor: Editor, files: File[], pos?: number) {
 		const content = files.map((file) => ({
 			type: 'image',

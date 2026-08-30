@@ -1,11 +1,12 @@
 import { describe, it, expect } from 'vitest';
 import { getSchema, type Extensions } from '@tiptap/core';
 import { Node } from '@tiptap/pm/model';
-import { text, paragraphs } from './doc.js';
+import { text, paragraphs, image, imageAttrs } from './doc.js';
 import type { ProseMirrorJSON } from './types/prosemirror.js';
 import { extensions as plain } from './components/editor/extensions-plain.js';
 import { extensions as multiline } from './components/editor/extensions-multiline.js';
 import { extensions as rich } from './components/editor/extensions-rich.js';
+import { extensions as imageExts } from './components/editor/extensions-image.js';
 
 /** The only check that matters: a real editor can load what the helper produced. */
 function parse(exts: Extensions, doc: ProseMirrorJSON) {
@@ -37,5 +38,41 @@ describe('paragraphs', () => {
 		expect(() => parse(rich, paragraphs())).not.toThrow();
 		expect(() => parse(multiline, paragraphs())).not.toThrow();
 		expect(parse(rich, paragraphs()).childCount).toBe(1);
+	});
+});
+
+describe('image', () => {
+	it('produces a document an image field can load', () => {
+		const doc = parse(imageExts, image('a.png', { alt: 'A' }));
+		expect(doc.childCount).toBe(1);
+		expect(doc.child(0).attrs.src).toBe('a.png');
+		expect(doc.child(0).attrs.alt).toBe('A');
+	});
+
+	// An `<img src="">` requests the current page; an empty document renders nothing.
+	it('is an empty document when nothing has been picked', () => {
+		expect(image().content).toEqual([]);
+		expect(() => parse(imageExts, image())).not.toThrow();
+	});
+
+	it('round-trips width and height, which is what stops the layout shift', () => {
+		const doc = parse(imageExts, image('a.png', { width: 800, height: 450 }));
+		expect([doc.child(0).attrs.width, doc.child(0).attrs.height]).toEqual([800, 450]);
+	});
+});
+
+describe('imageAttrs', () => {
+	it('reads back what image() stored', () => {
+		expect(imageAttrs(image('a.png', { alt: 'A', width: 8 }))).toEqual({
+			src: 'a.png',
+			alt: 'A',
+			width: 8
+		});
+	});
+
+	it('is {} for an unpicked image and for a document that holds no image', () => {
+		expect(imageAttrs(image())).toEqual({});
+		expect(imageAttrs(text('hi'))).toEqual({});
+		expect(imageAttrs(paragraphs('hi'))).toEqual({});
 	});
 });

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Field from '../field/field.svelte';
-	import type { TextEditorOptions, UploadHandler, Variant } from '../editor/index.js';
+	import type { TextEditorOptions, Variant } from '../editor/index.js';
 	import type { NodeOverrides } from '../renderer/types.js';
 	import type { ProseMirrorJSON } from '$lib/types/prosemirror.js';
 	import { getEditableContext } from '../editable/editable-context.svelte.js';
@@ -12,7 +12,6 @@
 		editing,
 		overrides,
 		options,
-		upload,
 		'aria-label': ariaLabel,
 		class: className
 	}: {
@@ -31,8 +30,6 @@
 		overrides?: NodeOverrides;
 		/** Merged over `Root`'s `options`, per key. */
 		options?: TextEditorOptions;
-		/** Falls back to `Root`'s `upload`. */
-		upload?: UploadHandler;
 		'aria-label'?: string;
 		class?: ClassValue;
 	} = $props();
@@ -42,12 +39,16 @@
 	const isEditing = $derived(editing ?? ctx?.editing ?? false);
 
 	/**
-	 * Whether writing `next` over `value` is a real change. Fields re-report their value
-	 * when they unmount, so without this a field disappearing would mark the form dirty.
-	 * Skipped once dirty, and it only runs on blur — never per keystroke.
+	 * The only place `value` is written. Blur and `flush` both come through here, so a
+	 * field saved without blurring first flags the form exactly as a blurred one does.
+	 *
+	 * The comparison is what keeps it honest: fields re-report their value when they
+	 * unmount, so without it a field disappearing would mark the form dirty. Skipped
+	 * once dirty, and it only runs on blur or save — never per keystroke.
 	 */
-	function changed(next: ProseMirrorJSON): boolean {
-		return JSON.stringify(value) !== JSON.stringify(next);
+	function write(next: ProseMirrorJSON) {
+		if (ctx && !ctx.dirty && JSON.stringify(value) !== JSON.stringify(next)) ctx.dirty = true;
+		value = next;
 	}
 </script>
 
@@ -57,21 +58,15 @@
 	editing={isEditing}
 	{overrides}
 	options={ctx?.editorOptions ? { ...ctx.editorOptions, ...options } : options}
-	upload={upload ?? ctx?.upload}
 	aria-label={ariaLabel}
 	class={className}
 	onfocus={(active) => {
 		if (ctx?.state) ctx.state.editor = active;
 		if (ctx) {
 			ctx.flush = () => {
-				if (!active.isDestroyed) {
-					value = active.getJSON() as ProseMirrorJSON;
-				}
+				if (!active.isDestroyed) write(active.getJSON() as ProseMirrorJSON);
 			};
 		}
 	}}
-	onchange={(next) => {
-		if (ctx && !ctx.dirty && changed(next)) ctx.dirty = true;
-		value = next;
-	}}
+	onchange={write}
 />

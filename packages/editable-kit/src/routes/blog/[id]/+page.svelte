@@ -3,7 +3,6 @@
 	import * as Editable from '$lib/index.js';
 	import * as db from '@routes/db.js';
 	import type { BlogPostData } from '@routes/types.js';
-	import { uploadAsDataURL } from '@routes/apply-fields.js';
 	import Nav from '@routes/nav.svelte';
 	import Footer from '@routes/footer.svelte';
 	import { page } from '$app/state';
@@ -40,7 +39,7 @@
 		</a>
 	</div>
 {:else}
-	<Editable.Root bind:data={post} {editing} upload={uploadAsDataURL} onsave={handleSave}>
+	<Editable.Root bind:data={post} {editing} onsave={handleSave}>
 		{#snippet children({ state, save, reset })}
 			<Nav
 				{editing}

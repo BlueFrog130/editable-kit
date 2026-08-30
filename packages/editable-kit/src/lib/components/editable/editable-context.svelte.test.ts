@@ -4,7 +4,8 @@ import { EditableContext } from './editable-context.svelte.js';
 
 /** The context reads `Root`'s props through getters and uses `$effect.pre`. */
 function makeContext(editing = true) {
-	const box = { value: editing, restore: vi.fn() };
+	// $state, so flipping `value` actually re-runs the context's $effect.pre
+	const box = $state({ value: editing, restore: vi.fn() });
 	let ctx!: EditableContext;
 	const destroy = $effect.root(() => {
 		ctx = new EditableContext({
@@ -128,5 +129,135 @@ describe('EditableContext', () => {
 			const { ctx } = context(false);
 			expect(ctx.state).toBeUndefined();
 		});
+	});
+});
+
+describe('EditableContext lifecycle', () => {
+	it('tears the toolbar state down when editing turns off, and keeps it across a re-entry', () => {
+		const { ctx, box } = context(true);
+		const first = ctx.state;
+		ctx.state!.editor = { isActive: () => false, on: () => {}, off: () => {} } as never;
+		ctx.flush = vi.fn();
+
+		box.value = false;
+		flushSync();
+
+		// The instance survives — its editor and pending flush do not.
+		expect(ctx.state).toBe(first);
+		expect(ctx.state!.editor).toBeUndefined();
+		expect(ctx.flush).toBeUndefined();
+	});
+
+	it('creates the toolbar state on the first switch into editing', () => {
+		const { ctx, box } = context(false);
+		expect(ctx.state).toBeUndefined();
+
+		box.value = true;
+		flushSync();
+		expect(ctx.state).toBeDefined();
+	});
+
+	it('exposes Root props live through getters', () => {
+		const box = $state({ value: true, restore: vi.fn() });
+		const overrides = { nodes: {} };
+		const options = { placeholder: 'hi' };
+		let ctx!: EditableContext;
+		const stop = $effect.root(() => {
+			ctx = new EditableContext({
+				get editing() {
+					return box.value;
+				},
+				overrides,
+				options,
+				restore: box.restore
+			});
+		});
+		flushSync();
+
+		expect([ctx.editing, ctx.overrides, ctx.editorOptions]).toEqual([true, overrides, options]);
+
+		box.value = false;
+		expect(ctx.editing).toBe(false);
+
+		ctx.destroy();
+		stop();
+	});
+
+	it('drops a pending status reset on destroy, so nothing writes after teardown', async () => {
+		vi.useFakeTimers();
+		const { ctx } = context();
+
+		await ctx.save(async () => {});
+		expect(ctx.saveStatus).toBe('saved');
+
+		ctx.destroy();
+		vi.advanceTimersByTime(5000);
+		expect(ctx.saveStatus).toBe('saved'); // the timer was cleared, not fired
+	});
+
+	it('lets a second save supersede the first save status timer', async () => {
+		vi.useFakeTimers();
+		const { ctx } = context();
+
+		await ctx.save(async () => {});
+		vi.advanceTimersByTime(1500); // first 'saved' timer is 500ms from firing
+
+		await ctx.save(async () => {});
+		vi.advanceTimersByTime(1500);
+		// The first timer must not drag the status to idle mid-way through the second.
+		expect(ctx.saveStatus).toBe('saved');
+
+		vi.advanceTimersByTime(500);
+		expect(ctx.saveStatus).toBe('idle');
+	});
+
+	it('clears the error status after its own window', async () => {
+		vi.useFakeTimers();
+		const { ctx } = context();
+
+		await expect(ctx.save(() => Promise.reject(new Error('x')))).rejects.toThrow('save failed');
+		expect(ctx.saveStatus).toBe('error');
+
+		vi.advanceTimersByTime(2000);
+		expect(ctx.saveStatus).toBe('error'); // longer window than 'saved'
+		vi.advanceTimersByTime(1000);
+		expect(ctx.saveStatus).toBe('idle');
+	});
+
+	it('saves with no persist callback at all', async () => {
+		const { ctx } = context();
+		await expect(ctx.save()).resolves.toBeUndefined();
+		expect(ctx.saveStatus).toBe('saved');
+	});
+
+	it('blurs the mounted editor before restoring, so it accepts the old content', () => {
+		const { ctx } = context();
+		const blur = vi.fn();
+		ctx.state!.editor = {
+			isDestroyed: false,
+			view: { dom: { blur } },
+			isActive: () => false,
+			on: () => {},
+			off: () => {}
+		} as never;
+
+		ctx.reset();
+		expect(blur).toHaveBeenCalledOnce();
+	});
+
+	it('does not touch a destroyed editor on reset', () => {
+		const { ctx, box } = context();
+		const blur = vi.fn();
+		ctx.state!.editor = {
+			isDestroyed: true,
+			view: { dom: { blur } },
+			isActive: () => false,
+			on: () => {},
+			off: () => {}
+		} as never;
+
+		ctx.reset();
+		expect(blur).not.toHaveBeenCalled();
+		expect(box.restore).toHaveBeenCalledOnce();
 	});
 });

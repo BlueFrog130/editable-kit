@@ -2,7 +2,7 @@
 	import * as Editable from 'editable-kit';
 	import type { EditableState } from 'editable-kit';
 	import type { Data } from '$lib/types';
-	import { createDefaultProject, upload } from '$lib';
+	import { createDefaultProject } from '$lib';
 	import * as Card from '$lib/components/ui/card/index.js';
 	import { Separator } from '$lib/components/ui/separator/index.js';
 	import type { Snippet } from 'svelte';
@@ -28,7 +28,7 @@
 	}
 </script>
 
-<Editable.Root bind:data {editing} {upload} {onsave}>
+<Editable.Root bind:data {editing} {onsave}>
 	{#snippet children({ state, save })}
 		{#if toolbar && editing}
 			{@render toolbar(state, save)}

@@ -188,7 +188,7 @@
 			<ul class="space-y-1.5 text-sm text-muted-foreground">
 				<li>One editing flag for every field</li>
 				<li>save(), reset(), dirty</li>
-				<li>Shared toolbar state and upload handler</li>
+				<li>Shared toolbar state</li>
 			</ul>
 		</div>
 	</div>

@@ -616,7 +616,8 @@ export const THEMING_IMAGE_CUSTOM = `\
 }`;
 
 export const PATTERN_IMAGE_UPLOAD = `\
-// Root's 'upload' turns a picked file into a URL. Every field inside uses it.
+// Nothing uploads for you: pick the file, upload it, set the image node.
+// This is the handler your toolbar button calls.
 async function upload(file: File): Promise<string> {
   const body = new FormData();
   body.append('file', file);
@@ -628,7 +629,11 @@ async function upload(file: File): Promise<string> {
   return url;
 }
 
-<Editable.Root bind:data {editing} {upload} onsave={handleSave}>...</Editable.Root>`;
+// In your toolbar, wired to the field's editor via EditableState:
+state.run(async (e) => {
+  const file = await pickFile();
+  if (file) e.chain().focus().setImage({ src: await upload(file) }).run();
+});`;
 
 export const PATTERN_BACKEND_SAVE = `\
 <script lang="ts">
@@ -809,7 +814,7 @@ export const EXT_COMPOSED_DEMO = `<script lang="ts">
     ];
   }
 
-  // Swap createObjectURL for the field's \`upload\` handler to persist the file.
+  // Swap createObjectURL for a real upload to persist the file.
   function insert(editor: Editor, files: File[], pos?: number) {
     const content = files.map((file) => ({
       type: 'image',

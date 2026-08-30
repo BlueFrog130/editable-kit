@@ -26,7 +26,7 @@ Turn any Svelte 5 page into an editable CMS-like experience. Bind a field at the
 
 - **Plain text editing** — Single-line and multiline `contenteditable` fields
 - **Rich text editing** — Full WYSIWYG powered by [TipTap](https://tiptap.dev/) (bold, italic, headings, links, lists, blockquotes, and more)
-- **Image editing** — Replace and re-describe images through TipTap's image node; you supply an `upload` handler
+- **Image editing** — Replace and re-describe images through TipTap's image node
 - **No layout shift** — TipTap mounts onto the already-rendered element instead of injecting its own, so toggling edit mode adds no box and changes no CSS selector match
 - **Type-safe** — The binding _is_ the type check: there are no string selectors to get wrong
 - **Zero editor code in view mode** — TipTap loads only when a field is actually focused, not when editing is switched on
@@ -78,7 +78,7 @@ yarn add editable-kit
 	{editing ? 'Cancel' : 'Edit'}
 </button>
 
-<Editable.Root bind:data {editing} upload={uploadImage} onsave={handleSave}>
+<Editable.Root bind:data {editing} onsave={handleSave}>
 	{#snippet children({ save, reset, dirty })}
 		<h1><Editable.Text bind:value={data.title} /></h1>
 		<div><Editable.Rich bind:value={data.body} /></div>
@@ -126,7 +126,7 @@ Optional, and the only wrapper there is. It gives every field beneath it shared 
 `editing` flag, one toolbar, one `save()`, one `reset()`, one `dirty`.
 
 ```svelte
-<Editable.Root bind:data {editing} {upload} onsave={handleSave}>
+<Editable.Root bind:data {editing} onsave={handleSave}>
 	{#snippet children({ state, save, reset, dirty, saveStatus })}
 		<!-- your editable content -->
 	{/snippet}
@@ -137,7 +137,6 @@ Optional, and the only wrapper there is. It gives every field beneath it shared 
 | ------------ | ----------------------------------------------------------------------- |
 | `editing`    | Toggles editing for every field inside                                  |
 | `data?`      | Bindable. Supply it to get `reset()` and to have it handed to `onsave`  |
-| `upload?`    | Default upload handler for every field inside                           |
 | `overrides?` | Default renderer overrides for every field inside                       |
 | `onsave?`    | `(data: T) => MaybePromise<void>` — receives a plain snapshot of `data` |
 
@@ -162,13 +161,21 @@ leaves `dirty` set and keeps the user in editing mode, so nothing is lost.
 
 ### Images
 
-Replacing an image needs an `upload` handler — set it once on `Root` (or per field). The library
-calls it with the picked `File` and points the image node at whatever URL you return:
+Nothing uploads for you — an image field holds whatever URL its document points at. Build the flow
+in your toolbar: `pickFile()` opens the picker, you upload, and `setImage` points the node at the
+result.
 
 ```ts
-async function uploadToR2(file: File) {
+import { pickFile } from 'editable-kit';
+
+async function replaceImage(state: EditableState) {
+	const file = await pickFile();
+	if (!file) return;
+
 	const res = await fetch('/api/upload', { method: 'POST', body: file });
-	return (await res.json()).url;
+	const { url } = await res.json();
+
+	state.run((editor) => editor.chain().focus().setImage({ src: url }).run());
 }
 ```
 
