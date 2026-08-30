@@ -1,0 +1,31 @@
+{
+	"name": "cloudflare-example",
+	"private": true,
+	"version": "0.0.0",
+	"type": "module",
+	"scripts": {
+		"dev": "vite dev",
+		"build": "vite build",
+		"preview": "wrangler dev",
+		"deploy": "wrangler deploy",
+		"prepare": "svelte-kit sync || echo ''",
+		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+		"db:migrate": "wrangler d1 migrations apply editable-kit --local"
+	},
+	"dependencies": {
+		"@editable-kit/cloudflare": "workspace:*",
+		"editable-kit": "workspace:*"
+	},
+	"devDependencies": {
+		"@cloudflare/workers-types": "^5.20260812.1",
+		"@sveltejs/adapter-cloudflare": "^7.2.9",
+		"@sveltejs/kit": "^2.70.2",
+		"@sveltejs/vite-plugin-svelte": "^7.3.0",
+		"@types/node": "^26.2.0",
+		"svelte": "5.56.9",
+		"svelte-check": "^4.7.5",
+		"typescript": "^5.9.3",
+		"vite": "^8.2.1",
+		"wrangler": "^4.122.0"
+	}
+}

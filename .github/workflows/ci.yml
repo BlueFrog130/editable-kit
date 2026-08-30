@@ -26,5 +26,5 @@ jobs:
 
       - run: pnpm lint
       - run: pnpm check
-      - run: pnpm test run
+      - run: pnpm test
       - run: pnpm package

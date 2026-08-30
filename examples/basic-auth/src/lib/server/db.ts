@@ -1,4 +1,5 @@
-import type { Data, ProjectData } from '$lib/types';
+import { image } from 'editable-kit';
+import type { Data } from '$lib/types';
 
 let data: Data = {
 	// Hero
@@ -10,10 +11,10 @@ let data: Data = {
 		type: 'doc',
 		content: [{ type: 'text', text: 'Content Creator & Digital Storyteller' }]
 	},
-	avatar: {
-		src: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face',
-		alt: 'John Doe portrait'
-	},
+	avatar: image(
+		'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face',
+		{ alt: 'John Doe portrait' }
+	),
 	bio: {
 		type: 'doc',
 		content: [
@@ -178,10 +179,10 @@ let data: Data = {
 					}
 				]
 			},
-			image: {
-				src: 'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=800&h=450&fit=crop',
-				alt: 'Behind the Lens documentary series'
-			}
+			image: image(
+				'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=800&h=450&fit=crop',
+				{ alt: 'Behind the Lens documentary series' }
+			)
 		},
 		{
 			title: {
@@ -217,10 +218,10 @@ let data: Data = {
 					}
 				]
 			},
-			image: {
-				src: 'https://images.unsplash.com/photo-1478737270239-2f02b77fc618?w=800&h=450&fit=crop',
-				alt: 'Creative Pulse podcast recording setup'
-			}
+			image: image(
+				'https://images.unsplash.com/photo-1478737270239-2f02b77fc618?w=800&h=450&fit=crop',
+				{ alt: 'Creative Pulse podcast recording setup' }
+			)
 		},
 		{
 			title: {
@@ -259,10 +260,10 @@ let data: Data = {
 					}
 				]
 			},
-			image: {
-				src: 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=800&h=450&fit=crop',
-				alt: 'Brand strategy workshop session'
-			}
+			image: image(
+				'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=800&h=450&fit=crop',
+				{ alt: 'Brand strategy workshop session' }
+			)
 		}
 	],
 
