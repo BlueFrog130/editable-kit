@@ -7,11 +7,7 @@ declare global {
 				DB: D1Database;
 				BUCKET: R2Bucket;
 				ADMIN_TOKEN?: string;
-				R2_PUBLIC_BASE_URL?: string;
 				DEPLOY_HOOK_URL?: string;
-				CF_IMAGES_ACCOUNT_ID?: string;
-				CF_IMAGES_API_TOKEN?: string;
-				CF_IMAGES_DELIVERY_URL?: string;
 			};
 			context: { waitUntil(promise: Promise<unknown>): void };
 		}

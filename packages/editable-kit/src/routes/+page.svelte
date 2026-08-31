@@ -51,8 +51,6 @@
 		params.delete('editing');
 		goto(`?${params}`);
 	}
-
-	$inspect(data);
 </script>
 
 <svelte:window onpageshow={handlePageShow} />

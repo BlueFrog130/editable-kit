@@ -35,7 +35,7 @@
 		"build": "pnpm -r build",
 		"package": "pnpm --filter editable-kit package",
 		"check": "pnpm -r check",
-		"test": "pnpm --filter editable-kit test run",
+		"test": "pnpm -r test run",
 		"lint": "oxlint && oxfmt --check",
 		"format": "oxfmt",
 		"changeset": "changeset",

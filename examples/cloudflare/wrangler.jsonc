@@ -7,15 +7,12 @@
 	"d1_databases": [
 		{ "binding": "DB", "database_name": "editable-kit", "database_id": "REPLACE_WITH_D1_ID" }
 	],
-	"r2_buckets": [{ "binding": "BUCKET", "bucket_name": "editable-kit-images" }],
+	"r2_buckets": [{ "binding": "BUCKET", "bucket_name": "editable-kit-assets" }],
 	"vars": {
-		// Images are served through this app's own /api/images route by default,
-		// so no public bucket domain is required for local dev.
-		// Set these to use Cloudflare Images instead of R2:
-		// "CF_IMAGES_ACCOUNT_ID": "...",
-		// "CF_IMAGES_DELIVERY_URL": "https://imagedelivery.net/<hash>",
+		// Assets are served through this app's own /assets/<sha256> route. In production,
+		// bind an R2 custom domain to that path instead so the bytes skip the Worker.
 		// SSG rebuild hook (fired after each write):
 		// "DEPLOY_HOOK_URL": "https://api.cloudflare.com/client/v4/pages/webhooks/deploy_hooks/<id>"
 	}
-	// Secrets (wrangler secret put / .dev.vars): ADMIN_TOKEN, CF_IMAGES_API_TOKEN
+	// Secrets (wrangler secret put / .dev.vars): ADMIN_TOKEN
 }
