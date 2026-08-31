@@ -1,4 +1,4 @@
-import { text, paragraphs, image } from 'editable-kit';
+import { text, paragraphs, image } from '@editable-kit/svelte';
 import type { ProjectData } from './types';
 
 // place files you want to import through the `$lib` alias in this folder.

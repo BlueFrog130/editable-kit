@@ -1,0 +1,85 @@
+{
+	"name": "@editable-kit/adapter-cloudflare",
+	"version": "0.0.0",
+	"description": "Cloudflare backend for editable-kit — D1 content records, content-addressed R2 assets, framework-agnostic Request/Response handlers",
+	"type": "module",
+	"exports": {
+		".": "./src/index.ts",
+		"./assets": "./src/assets.ts",
+		"./content": "./src/content.ts",
+		"./gc": "./src/gc.ts",
+		"./routes": "./src/routes.ts",
+		"./client": "./src/client.ts"
+	},
+	"files": [
+		"dist",
+		"src",
+		"migrations",
+		"!**/*.test.*",
+		"!src/test-*.ts"
+	],
+	"publishConfig": {
+		"exports": {
+			".": {
+				"types": "./dist/index.d.ts",
+				"default": "./dist/index.js"
+			},
+			"./assets": {
+				"types": "./dist/assets.d.ts",
+				"default": "./dist/assets.js"
+			},
+			"./content": {
+				"types": "./dist/content.d.ts",
+				"default": "./dist/content.js"
+			},
+			"./gc": {
+				"types": "./dist/gc.d.ts",
+				"default": "./dist/gc.js"
+			},
+			"./routes": {
+				"types": "./dist/routes.d.ts",
+				"default": "./dist/routes.js"
+			},
+			"./client": {
+				"types": "./dist/client.d.ts",
+				"default": "./dist/client.js"
+			}
+		},
+		"main": "./dist/index.js",
+		"types": "./dist/index.d.ts"
+	},
+	"scripts": {
+		"build": "tsc -p tsconfig.build.json",
+		"check": "tsc --noEmit",
+		"test": "vitest",
+		"prepublishOnly": "pnpm build"
+	},
+	"devDependencies": {
+		"@cloudflare/vitest-pool-workers": "^0.22.0",
+		"@cloudflare/workers-types": "^5.20260812.1",
+		"typescript": "^5.9.3",
+		"vitest": "^4.1.10",
+		"wrangler": "^4.122.0"
+	},
+	"keywords": [
+		"editable-kit",
+		"cloudflare",
+		"workers",
+		"d1",
+		"r2",
+		"cms"
+	],
+	"author": "BlueFrog130",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/BlueFrog130/editable-kit.git",
+		"directory": "packages/adapter-cloudflare"
+	},
+	"homepage": "https://github.com/BlueFrog130/editable-kit",
+	"bugs": {
+		"url": "https://github.com/BlueFrog130/editable-kit/issues"
+	},
+	"main": "./src/index.ts",
+	"types": "./src/index.ts"
+}

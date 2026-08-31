@@ -1,6 +1,6 @@
 <script lang="ts">
-	import * as Editable from 'editable-kit';
-	import type { EditableState } from 'editable-kit';
+	import * as Editable from '@editable-kit/svelte';
+	import type { EditableState } from '@editable-kit/svelte';
 	import type { Data } from '$lib/types';
 	import { createDefaultProject } from '$lib';
 	import * as Card from '$lib/components/ui/card/index.js';

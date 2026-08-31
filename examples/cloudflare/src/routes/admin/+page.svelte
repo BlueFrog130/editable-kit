@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { Root, pickFile } from 'editable-kit';
-	import { saveToApi, uploadAsset } from '@editable-kit/cloudflare/client';
+	import { Root, pickFile } from '@editable-kit/svelte';
+	import { saveToApi, uploadAsset } from '@editable-kit/adapter-cloudflare/client';
 	import { HOME_KEY, type HomeContent } from '$lib/content';
 	import Home from '../home.svelte';
 

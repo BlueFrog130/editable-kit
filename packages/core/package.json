@@ -1,0 +1,84 @@
+{
+	"name": "@editable-kit/core",
+	"version": "0.0.0",
+	"description": "Framework-agnostic core for editable-kit — ProseMirror document types, TipTap extension sets, and the field editor lifecycle",
+	"keywords": [
+		"inline-editing",
+		"contenteditable",
+		"rich-text",
+		"tiptap",
+		"prosemirror",
+		"editable"
+	],
+	"author": "BlueFrog130",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/BlueFrog130/editable-kit.git",
+		"directory": "packages/core"
+	},
+	"homepage": "https://github.com/BlueFrog130/editable-kit",
+	"bugs": {
+		"url": "https://github.com/BlueFrog130/editable-kit/issues"
+	},
+	"type": "module",
+	"exports": {
+		".": "./src/index.ts",
+		"./types": "./src/prosemirror.ts"
+	},
+	"main": "./src/index.ts",
+	"types": "./src/index.ts",
+	"files": [
+		"dist",
+		"src",
+		"!**/*.test.*"
+	],
+	"publishConfig": {
+		"exports": {
+			".": {
+				"types": "./dist/index.d.ts",
+				"default": "./dist/index.js"
+			},
+			"./types": {
+				"types": "./dist/prosemirror.d.ts",
+				"default": "./dist/prosemirror.js"
+			}
+		},
+		"main": "./dist/index.js",
+		"types": "./dist/index.d.ts"
+	},
+	"scripts": {
+		"build": "tsc -p tsconfig.build.json && node -e \"require('fs').copyFileSync('src/tiptap-commands.d.ts','dist/tiptap-commands.d.ts')\"",
+		"check": "tsc --noEmit",
+		"test": "vitest",
+		"prepublishOnly": "pnpm build"
+	},
+	"dependencies": {
+		"@tiptap/core": "catalog:",
+		"@tiptap/extension-blockquote": "catalog:",
+		"@tiptap/extension-bold": "catalog:",
+		"@tiptap/extension-bullet-list": "catalog:",
+		"@tiptap/extension-document": "catalog:",
+		"@tiptap/extension-dropcursor": "catalog:",
+		"@tiptap/extension-gapcursor": "catalog:",
+		"@tiptap/extension-hard-break": "catalog:",
+		"@tiptap/extension-heading": "catalog:",
+		"@tiptap/extension-history": "catalog:",
+		"@tiptap/extension-image": "catalog:",
+		"@tiptap/extension-italic": "catalog:",
+		"@tiptap/extension-link": "catalog:",
+		"@tiptap/extension-list-item": "catalog:",
+		"@tiptap/extension-ordered-list": "catalog:",
+		"@tiptap/extension-paragraph": "catalog:",
+		"@tiptap/extension-placeholder": "catalog:",
+		"@tiptap/extension-strike": "catalog:",
+		"@tiptap/extension-text": "catalog:",
+		"@tiptap/extension-underline": "catalog:",
+		"@tiptap/pm": "catalog:"
+	},
+	"devDependencies": {
+		"jsdom": "^30.0.1",
+		"typescript": "^5.9.3",
+		"vitest": "^4.1.11"
+	}
+}

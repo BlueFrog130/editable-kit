@@ -1,5 +1,5 @@
 import type { PageServerLoad } from './$types';
-import { getRecord } from '@editable-kit/cloudflare/content';
+import { getRecord } from '@editable-kit/adapter-cloudflare/content';
 import { DEFAULT_HOME, HOME_KEY, type HomeContent } from '$lib/content';
 import { ADMIN_TOKEN } from '$env/static/private';
 

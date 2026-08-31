@@ -1,7 +1,7 @@
 # editable-kit × Cloudflare example
 
 Admin + public site backed by **D1** (content records) and **R2** (assets), rendering either
-**dynamically** or as **SSG**. Built on `@editable-kit/cloudflare`.
+**dynamically** or as **SSG**. Built on `@editable-kit/adapter-cloudflare`.
 
 ## Layout
 
@@ -74,7 +74,7 @@ along with editing. On Workers, delete that and add a `scheduled` handler instea
 ```ts
 // custom entrypoint
 import handler from '../.svelte-kit/cloudflare/_worker.js';
-import { sweepAssets } from '@editable-kit/cloudflare/gc';
+import { sweepAssets } from '@editable-kit/adapter-cloudflare/gc';
 
 export default {
 	fetch: handler.fetch,

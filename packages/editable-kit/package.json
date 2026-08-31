@@ -1,21 +1,11 @@
 {
 	"name": "editable-kit",
-	"version": "0.2.2",
-	"description": "Svelte 5 component library for inline editing — editable text, rich text (TipTap), and images with cropping",
+	"version": "1.0.0",
+	"description": "Deprecated — renamed to @editable-kit/svelte. This package re-exports it.",
 	"keywords": [
-		"svelte",
-		"svelte5",
-		"sveltekit",
-		"inline-editing",
-		"contenteditable",
-		"rich-text",
-		"tiptap",
-		"wysiwyg",
-		"image-editor",
-		"image-cropping",
-		"component-library",
-		"editable",
-		"prosemirror"
+		"deprecated",
+		"editable-kit",
+		"svelte"
 	],
 	"author": "BlueFrog130",
 	"license": "MIT",
@@ -29,102 +19,31 @@
 		"url": "https://github.com/BlueFrog130/editable-kit/issues"
 	},
 	"type": "module",
-	"scripts": {
-		"build": "pnpm package",
-		"build:site": "vite build && node scripts/generate-llms-txt.js",
-		"dev": "vite dev",
-		"preview": "vite preview",
-		"package": "svelte-kit sync && svelte-package && publint",
-		"prepublishOnly": "pnpm package",
-		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-		"test": "vitest",
-		"release": "pnpm check && pnpm test run && pnpm package && npm publish --access public"
-	},
 	"exports": {
 		".": {
-			"types": "./dist/index.d.ts",
-			"svelte": "./dist/index.js"
-		},
-		"./types": {
-			"types": "./dist/types/prosemirror.d.ts",
-			"svelte": "./dist/types/prosemirror.js"
+			"types": "./src/index.d.ts",
+			"svelte": "./src/index.js",
+			"default": "./src/index.js"
 		},
 		"./renderer": {
-			"types": "./dist/components/renderer/index.d.ts",
-			"svelte": "./dist/components/renderer/index.js"
+			"types": "./src/renderer.d.ts",
+			"svelte": "./src/renderer.js",
+			"default": "./src/renderer.js"
 		}
 	},
+	"types": "./src/index.d.ts",
+	"svelte": "./src/index.js",
 	"files": [
-		"dist",
-		"!dist/**/*.test.*",
-		"!dist/**/*.spec.*"
+		"src",
+		"README.md"
 	],
-	"svelte": "./dist/index.js",
-	"types": "./dist/index.d.ts",
-	"peerDependencies": {
-		"svelte": "^5.0.0-next.1"
+	"scripts": {
+		"check": "tsc --noEmit"
 	},
 	"dependencies": {
-		"@tiptap/core": "^3.30.2",
-		"@tiptap/extension-blockquote": "^3.30.2",
-		"@tiptap/extension-bold": "^3.30.2",
-		"@tiptap/extension-bullet-list": "^3.30.2",
-		"@tiptap/extension-document": "^3.30.2",
-		"@tiptap/extension-dropcursor": "^3.30.2",
-		"@tiptap/extension-gapcursor": "^3.30.2",
-		"@tiptap/extension-hard-break": "^3.30.2",
-		"@tiptap/extension-heading": "^3.30.2",
-		"@tiptap/extension-history": "^3.30.2",
-		"@tiptap/extension-image": "^3.30.2",
-		"@tiptap/extension-italic": "^3.30.2",
-		"@tiptap/extension-link": "^3.30.2",
-		"@tiptap/extension-list-item": "^3.30.2",
-		"@tiptap/extension-ordered-list": "^3.30.2",
-		"@tiptap/extension-paragraph": "^3.30.2",
-		"@tiptap/extension-placeholder": "^3.30.2",
-		"@tiptap/extension-strike": "^3.30.2",
-		"@tiptap/extension-text": "^3.30.2",
-		"@tiptap/extension-underline": "^3.30.2",
-		"@tiptap/pm": "^3.30.2"
+		"@editable-kit/svelte": "workspace:*"
 	},
 	"devDependencies": {
-		"@floating-ui/dom": "^1.8.0",
-		"@internationalized/date": "^3.12.3",
-		"@lucide/svelte": "^1.33.0",
-		"@shikijs/langs": "^4.4.3",
-		"@shikijs/themes": "^4.4.3",
-		"@sveltejs/adapter-auto": "^7.0.1",
-		"@sveltejs/adapter-static": "^3.0.10",
-		"@sveltejs/kit": "^2.70.3",
-		"@sveltejs/package": "^2.5.8",
-		"@sveltejs/vite-plugin-svelte": "^7.3.0",
-		"@tailwindcss/typography": "^0.5.20",
-		"@tailwindcss/vite": "^4.3.3",
-		"@testing-library/jest-dom": "^7.0.1",
-		"@testing-library/svelte": "^5.4.2",
-		"@tiptap/extension-code-block": "^3.30.5",
-		"@tiptap/extension-drag-handle": "^3.30.5",
-		"@tiptap/extension-file-handler": "^3.30.5",
-		"@types/node": "^26.2.0",
-		"@types/turndown": "^5.0.6",
-		"bits-ui": "^2.18.2",
-		"clsx": "^2.1.1",
-		"jsdom": "^30.0.1",
-		"publint": "^0.3.24",
-		"shiki": "^4.4.3",
-		"svelte": "5.56.9",
-		"svelte-check": "^4.7.6",
-		"tailwind-merge": "^3.6.0",
-		"tailwind-variants": "^3.3.1",
-		"tailwindcss": "^4.3.3",
-		"tiptap-extension-code-block-shiki": "^1.2.0",
-		"tslib": "^2.8.1",
-		"turndown": "^7.2.4",
-		"tw-animate-css": "^1.4.0",
-		"typescript": "^5.9.3",
-		"vite": "^8.2.1",
-		"vite-plugin-devtools-json": "^1.1.0",
-		"vitest": "^4.1.11"
+		"typescript": "^5.9.3"
 	}
 }

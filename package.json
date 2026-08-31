@@ -31,15 +31,17 @@
 		"url": "https://github.com/BlueFrog130/editable-kit/issues"
 	},
 	"scripts": {
-		"dev": "pnpm --filter editable-kit dev",
+		"dev": "pnpm --filter @editable-kit/svelte dev",
 		"build": "pnpm -r build",
-		"package": "pnpm --filter editable-kit package",
+		"build:packages": "pnpm --filter \"./packages/**\" build",
+		"build:site": "pnpm --filter @editable-kit/svelte build:site",
+		"package": "pnpm --filter @editable-kit/svelte package",
 		"check": "pnpm -r check",
 		"test": "pnpm -r test run",
 		"lint": "oxlint && oxfmt --check",
 		"format": "oxfmt",
 		"changeset": "changeset",
-		"release": "pnpm --filter editable-kit release"
+		"release": "pnpm build:packages && changeset publish"
 	},
 	"devDependencies": {
 		"@changesets/changelog-github": "^1.0.0",

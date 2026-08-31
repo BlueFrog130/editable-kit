@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { pickFile, type EditableState } from 'editable-kit';
+	import { pickFile, type EditableState } from '@editable-kit/svelte';
 	import { enhance } from '$app/forms';
 	import { upload } from '$lib';
 	import { Button } from '$lib/components/ui/button/index.js';

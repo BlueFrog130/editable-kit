@@ -1,5 +1,6 @@
 ---
-'editable-kit': major
+'@editable-kit/svelte': major
+'@editable-kit/core': major
 ---
 
 Bind fields straight at your data. `Editable.Data` and `Editable.Each` are gone, and with them the
@@ -41,7 +42,7 @@ Bind fields straight at your data. `Editable.Data` and `Editable.Each` are gone,
   `RichText` → `Rich`, `EditableImage` → `Image`, `EditableField` → `Field`. All are exported from
   the package root.
 - **Removed** the `editable-kit/editable` and `editable-kit/editors` subpath exports. Import from
-  `editable-kit`; `editable-kit/renderer` still exists.
+  `@editable-kit/svelte`; `@editable-kit/svelte/renderer` still exists.
 - **Removed** the `key` prop from every component.
 - **Changed** `Root`'s `onsave` from `(data: SaveResult) => …` to `(data: T) => …`, where `T` is
   whatever you bound to `Root`'s new `data` prop. It receives a plain snapshot, already flushed.

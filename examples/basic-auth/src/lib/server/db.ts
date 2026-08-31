@@ -1,4 +1,4 @@
-import { image } from 'editable-kit';
+import { image } from '@editable-kit/svelte';
 import type { Data } from '$lib/types';
 
 let data: Data = {

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { HomeContent } from '$lib/content';
-	import * as Editable from 'editable-kit';
+	import * as Editable from '@editable-kit/svelte';
 
 	let { content = $bindable() }: { content: HomeContent } = $props();
 </script>

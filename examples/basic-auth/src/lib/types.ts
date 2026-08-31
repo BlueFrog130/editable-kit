@@ -1,4 +1,4 @@
-import type { ProseMirrorJSON } from 'editable-kit';
+import type { ProseMirrorJSON } from '@editable-kit/svelte';
 import * as v from 'valibot';
 
 export type ProjectData = {

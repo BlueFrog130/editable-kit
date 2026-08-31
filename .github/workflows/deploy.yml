@@ -33,13 +33,13 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      - run: pnpm --filter editable-kit build:site
+      - run: pnpm --filter @editable-kit/core build && pnpm --filter @editable-kit/svelte build:site
         env:
           BASE_PATH: /editable-kit
 
       - uses: actions/upload-pages-artifact@v4
         with:
-          path: packages/editable-kit/build
+          path: packages/svelte/build
 
   deploy:
     needs: build

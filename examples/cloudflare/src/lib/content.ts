@@ -1,5 +1,5 @@
-import { image, paragraphs, text } from 'editable-kit';
-import type { ProseMirrorJSON } from 'editable-kit';
+import { image, paragraphs, text } from '@editable-kit/svelte';
+import type { ProseMirrorJSON } from '@editable-kit/svelte';
 
 /** The single content record this example edits. */
 export type HomeContent = {

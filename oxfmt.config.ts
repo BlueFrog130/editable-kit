@@ -9,7 +9,7 @@ export default defineConfig({
 	// requires `svelte` at the root — oxfmt doesn't bundle svelte/compiler
 	svelte: {},
 	sortTailwindcss: {
-		stylesheet: './packages/editable-kit/src/app.css'
+		stylesheet: './packages/svelte/src/app.css'
 	},
 	ignorePatterns: ['pnpm-lock.yaml', '**/.svelte-kit/**', '**/dist/**', '**/build/**']
 });
