@@ -35,10 +35,7 @@
 				 removed or reordered row cannot leave an editor pointed at the wrong note. -->
 			{#each data as note, i (note)}
 				<article
-					class="group/card relative overflow-hidden rounded-xl border border-border bg-background shadow-sm transition-shadow hover:shadow-md {i ===
-					0
-						? 'lg:col-span-2 lg:row-span-2'
-						: ''}"
+					class="group/card relative bg-background {i === 0 ? 'lg:col-span-2 lg:row-span-2' : ''}"
 				>
 					{#if editing}
 						<button
@@ -51,7 +48,9 @@
 					{/if}
 
 					{#if i === 0}
-						<div class="grid h-full lg:grid-cols-2">
+						<div
+							class="grid h-full overflow-hidden rounded-xl border border-border shadow-sm transition-shadow hover:shadow-md lg:grid-cols-2"
+						>
 							<div class="aspect-8/5 overflow-hidden lg:aspect-auto">
 								<Editable.Image
 									class="block size-full [&>img]:size-full [&>img]:object-cover"
@@ -73,20 +72,24 @@
 							</div>
 						</div>
 					{:else}
-						<div class="aspect-8/5 overflow-hidden">
-							<Editable.Image bind:value={note.image} />
-						</div>
-						<div class="p-6">
-							<span
-								class="mb-3 inline-flex h-7 w-7 items-center justify-center rounded-lg bg-primary text-xs font-semibold text-primary-foreground"
-							>
-								{i + 1}
-							</span>
-							<h3 class="font-serif text-xl tracking-tight">
-								<Editable.Text bind:value={note.title} />
-							</h3>
-							<div class="mt-2 text-sm leading-relaxed text-muted-foreground">
-								<Editable.Multiline bind:value={note.body} />
+						<div
+							class="overflow-hidden rounded-xl border border-border shadow-sm transition-shadow hover:shadow-md"
+						>
+							<div class="aspect-8/5 overflow-hidden">
+								<Editable.Image bind:value={note.image} />
+							</div>
+							<div class="p-6">
+								<span
+									class="mb-3 inline-flex h-7 w-7 items-center justify-center rounded-lg bg-primary text-xs font-semibold text-primary-foreground"
+								>
+									{i + 1}
+								</span>
+								<h3 class="font-serif text-xl tracking-tight">
+									<Editable.Text bind:value={note.title} />
+								</h3>
+								<div class="mt-2 text-sm leading-relaxed text-muted-foreground">
+									<Editable.Multiline bind:value={note.body} />
+								</div>
 							</div>
 						</div>
 					{/if}
