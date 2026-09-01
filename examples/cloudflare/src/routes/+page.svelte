@@ -1,8 +1,11 @@
 <script lang="ts">
-	import type { HomeContent } from '$lib/content';
-	import Home from './home.svelte';
-
-	let { data }: { data: { content: HomeContent } } = $props();
+	import Content from './content.svelte';
+	let { data } = $props();
 </script>
 
-<Home content={data.content} />
+<Content content={data.content} editing={false} />
+
+<div class="bar">
+	<div class="grow"></div>
+	<a class="btn" href="/admin">Edit</a>
+</div>

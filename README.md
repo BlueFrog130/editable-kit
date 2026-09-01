@@ -9,16 +9,15 @@ that already rendered your content, so edit mode adds no box.
 | ----------------------------- | ---------------------------------- | ------------------------------------------------------------------------------------------------------- |
 | `packages/core`               | `@editable-kit/core`               | Framework-agnostic: document types, TipTap extension sets, the field editor lifecycle. No UI framework. |
 | `packages/svelte`             | `@editable-kit/svelte`             | The Svelte 5 components + the docs/demo site (GitHub Pages). Re-exports all of core.                    |
-| `packages/adapter-cloudflare` | `@editable-kit/adapter-cloudflare` | D1 content records, content-addressed R2 assets, web-standard `Request`/`Response` handlers.            |
 | `packages/editable-kit`       | `editable-kit`                     | Deprecated. Re-exports `@editable-kit/svelte` so existing installs keep working.                        |
 | `examples/basic-auth`         | `basic-auth`                       | Example app — session auth, local disk storage.                                                         |
-| `examples/cloudflare`         | `cloudflare-example`               | Example app — Workers, D1, R2.                                                                          |
+| `examples/cloudflare`         | `cloudflare-example`               | Example app — Workers, content and images in R2.                                                        |
 
-Everything framework-agnostic lives in `core`; only `svelte` depends on a UI framework, and
-`adapter-cloudflare` depends on neither. The graph is a line:
+Everything framework-agnostic lives in `core`; only `svelte` depends on a UI framework. The graph
+is a line:
 
 ```
-@editable-kit/core ──> @editable-kit/svelte        @editable-kit/adapter-cloudflare
+@editable-kit/core ──> @editable-kit/svelte
 ```
 
 If you are building a Svelte app, install `@editable-kit/svelte` — it pulls core in and re-exports
@@ -36,7 +35,7 @@ declare module '@editable-kit/core/types' {
 ## Releasing
 
 Changesets, unchanged by the split. `core` and `svelte` are `linked` in `.changeset/config.json`, so
-they always carry the same version; `adapter-cloudflare` versions independently.
+they always carry the same version.
 
 ```bash
 pnpm changeset      # describe the change, pick the packages
@@ -49,8 +48,8 @@ pushes the git tags.
 
 Two mechanisms do work at pack time, so what you publish is not what sits in the repo:
 
-- `publishConfig.exports` in `core` and `adapter-cloudflare` swaps the source-resolved `exports` for
-  compiled `dist`. Consumers never receive TypeScript.
+- `publishConfig.exports` in `core` swaps the source-resolved `exports` for compiled `dist`.
+  Consumers never receive TypeScript.
 - `workspace:^` and `catalog:` are replaced with real semver ranges.
 
 Verify either with `pnpm pack` in the package directory and reading the `package.json` inside the
@@ -58,7 +57,7 @@ tarball — that is exactly what npm would receive.
 
 ### First release only
 
-The three scoped packages have never been published, so this run needs a few things the steady
+The scoped packages have never been published, so this run needs a few things the steady
 state does not:
 
 1. **npm auth.** `.github/workflows/publish.yml` sets `id-token: write` and a `publish`
@@ -91,10 +90,10 @@ state does not:
 - `pnpm test` — run every package's tests
 - `pnpm lint` / `pnpm format` — oxlint + oxfmt across the workspace
 
-`core` and `adapter-cloudflare` resolve to TypeScript source inside the workspace, so editing them
-hot-reloads into `pnpm dev` with no build step; `publishConfig.exports` swaps in compiled `dist`
-when pnpm packs, so consumers never receive TypeScript. Apps consuming them from the workspace need
-`ssr.noExternal` and `server.fs.allow` in their Vite config — see the examples.
+`core` resolves to TypeScript source inside the workspace, so editing it hot-reloads into
+`pnpm dev` with no build step; `publishConfig.exports` swaps in compiled `dist` when pnpm packs, so
+consumers never receive TypeScript. Apps consuming it from the workspace need `ssr.noExternal` and
+`server.fs.allow` in their Vite config — see the examples.
 
 Package manager is **pnpm**. Every `@tiptap/*` version is pinned once in the `catalog:` block of
 `pnpm-workspace.yaml` — a split peer resolution gives you two copies of `@tiptap/core`, and TipTap's

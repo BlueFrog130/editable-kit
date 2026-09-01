@@ -1,0 +1,96 @@
+:root {
+	--fg: #16181d;
+	--muted: #6b7280;
+	--line: #e5e7eb;
+	--bg: #fff;
+	color-scheme: light dark;
+}
+@media (prefers-color-scheme: dark) {
+	:root {
+		--fg: #e8eaed;
+		--muted: #9aa1ab;
+		--line: #2a2e36;
+		--bg: #0f1115;
+	}
+}
+body {
+	margin: 0;
+	background: var(--bg);
+	color: var(--fg);
+	font:
+		16px/1.6 ui-sans-serif,
+		system-ui,
+		sans-serif;
+}
+article {
+	max-width: 44rem;
+	margin: 0 auto;
+	padding: 3rem 1.5rem 6rem;
+}
+h1 {
+	font-size: 2.5rem;
+	line-height: 1.15;
+	margin: 1.5rem 0 0.5rem;
+}
+.tagline {
+	color: var(--muted);
+	font-size: 1.15rem;
+	margin: 0 0 2rem;
+}
+img {
+	display: block;
+	width: 100%;
+	border-radius: 0.75rem;
+}
+a {
+	color: inherit;
+}
+
+/* The field is the same element in view and edit mode — style it once.
+   Key off ProseMirror's own .ProseMirror-focused, not :focus: the library ships
+   `[data-ek-field]:focus { outline: none }` at the same specificity and later in
+   the cascade, so a plain :focus rule here loses. The `article` prefix outranks it. */
+article [data-ek-field].ProseMirror-focused {
+	outline: 2px solid #3b82f6;
+	outline-offset: 4px;
+	border-radius: 2px;
+}
+article.editing [data-ek-field]:hover:not(.ProseMirror-focused) {
+	outline: 1px dashed var(--line);
+	outline-offset: 4px;
+	border-radius: 2px;
+}
+
+.bar {
+	position: fixed;
+	inset: auto 0 0 0;
+	display: flex;
+	gap: 0.5rem;
+	align-items: center;
+	padding: 0.6rem 1rem;
+	background: var(--bg);
+	border-top: 1px solid var(--line);
+}
+button,
+.btn {
+	font: inherit;
+	font-size: 0.875rem;
+	padding: 0.35rem 0.75rem;
+	border: 1px solid var(--line);
+	border-radius: 0.4rem;
+	background: transparent;
+	color: inherit;
+	cursor: pointer;
+	text-decoration: none;
+}
+button[aria-pressed='true'] {
+	background: var(--fg);
+	color: var(--bg);
+}
+button:disabled {
+	opacity: 0.4;
+	cursor: default;
+}
+.grow {
+	flex: 1;
+}

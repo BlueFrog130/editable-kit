@@ -1,69 +1,51 @@
 <script lang="ts">
-	import { Root, pickFile } from '@editable-kit/svelte';
-	import { saveToApi, uploadAsset } from '@editable-kit/adapter-cloudflare/client';
-	import { HOME_KEY, type HomeContent } from '$lib/content';
-	import Home from '../home.svelte';
+	import { untrack } from 'svelte';
+	import { goto } from '$app/navigation';
+	import Content from '../content.svelte';
+	import Toolbar from './toolbar.svelte';
+	import type { Content as ContentData } from '$lib/content';
 
-	let { data }: { data: { content: HomeContent; version: number; token: string } } = $props();
+	let { data } = $props();
+	// One working copy, snapshotted once: edits must not write into the load data.
+	let content = $state(untrack(() => structuredClone(data.content)));
+	let token = $state(sessionStorage.getItem('ek-token') ?? '');
+	let error = $state('');
 
-	let editing = $state(false);
-	// The version last written, if we have written one — otherwise whatever the load gave us.
-	let saved: number | undefined = $state();
-	const version = $derived(saved ?? data.version);
-	let error: string | undefined = $state();
-	const saveContent = $derived(saveToApi({ token: data.token }));
+	async function save(saved: ContentData) {
+		error = '';
+		const res = await fetch('/api/content', {
+			method: 'PUT',
+			headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json' },
+			body: JSON.stringify(saved)
+		});
+		if (!res.ok) {
+			error = res.status === 401 ? 'Wrong admin token.' : `Save failed (${res.status})`;
+			throw new Error(error);
+		}
+		goto('/', { invalidateAll: true });
+	}
 </script>
 
-<!-- Admin: dynamic, edits the record inline and saves through the content API. -->
-<Root
-	bind:data={data.content}
-	{editing}
-	onsave={async (record) => {
-		saved = await saveContent(HOME_KEY, record, version);
-	}}
->
-	{#snippet children({ state, save, saveStatus })}
-		<div style="display:flex; gap:.5rem; align-items:center; margin-bottom:1rem">
-			{#if editing}
-				<button
-					onclick={async () => {
-						error = undefined;
-						try {
-							await save();
-							editing = false;
-						} catch (e) {
-							error = e instanceof Error ? e.message : 'Save failed';
-						}
-					}}>Save</button
-				>
-				<button onclick={() => (editing = false)}>Cancel</button>
-
-				<!-- The file is uploaded on pick, named by its own hash, and the field is pointed
-					 at that path. Uploading is not a commitment: cancel, or replace it again, and
-					 the sweeper collects whatever no saved record ended up referencing. Acts on
-					 whichever field has focus, so click the hero (or into the body) first.
-					 `state.editor` survives this button taking focus, which is why the click lands. -->
-				<button
-					disabled={!state?.has('image')}
-					onclick={async () => {
-						error = undefined;
-						const file = await pickFile();
-						if (!file) return;
-						try {
-							const src = await uploadAsset(file, { token: data.token });
-							state?.run((e) => e.chain().focus().setImage({ src }).run());
-						} catch (e) {
-							error = e instanceof Error ? e.message : 'Upload failed';
-						}
-					}}>Replace image</button
-				>
-			{:else}
-				<button onclick={() => (editing = true)}>Edit</button>
-			{/if}
-			<span style="color:#888">{saveStatus}</span>
-			{#if error}<span style="color:#c00">{error}</span>{/if}
-		</div>
-
-		<Home bind:content={data.content} />
-	{/snippet}
-</Root>
+{#if token}
+	<Content bind:content editing={true} onsave={save}>
+		{#snippet toolbar(state, onsave)}
+			<Toolbar {state} {onsave} {token} {error} oncancel={() => goto('/')} />
+		{/snippet}
+	</Content>
+{:else}
+	<article>
+		<h1>Admin</h1>
+		<p class="tagline">Enter the <code>ADMIN_TOKEN</code> this Worker was deployed with.</p>
+		<form
+			onsubmit={(e) => {
+				e.preventDefault();
+				const value = new FormData(e.currentTarget).get('token') as string;
+				sessionStorage.setItem('ek-token', value);
+				token = value;
+			}}
+		>
+			<input name="token" type="password" placeholder="Admin token" autocomplete="off" />
+			<button type="submit">Continue</button>
+		</form>
+	</article>
+{/if}

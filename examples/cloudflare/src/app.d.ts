@@ -7,9 +7,7 @@ declare global {
 				DB: D1Database;
 				BUCKET: R2Bucket;
 				ADMIN_TOKEN?: string;
-				DEPLOY_HOOK_URL?: string;
 			};
-			context: { waitUntil(promise: Promise<unknown>): void };
 		}
 	}
 }

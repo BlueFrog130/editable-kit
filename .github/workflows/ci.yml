@@ -26,8 +26,7 @@ jobs:
 
       - run: pnpm lint
       # Build first: the examples resolve @editable-kit/svelte through its exports map,
-      # so `check` cannot see it until dist exists. Packages only — building the
-      # Cloudflare example needs its ADMIN_TOKEN, which CI has no business holding.
+      # so `check` cannot see it until dist exists.
       - run: pnpm build:packages
       - run: pnpm check
       - run: pnpm test
