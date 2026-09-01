@@ -21,7 +21,7 @@
 				<code
 					class="inline-flex h-11 items-center rounded-md border border-border bg-background px-5 font-mono text-sm text-muted-foreground"
 				>
-					pnpm add editable-kit
+					pnpm add @editable-kit/svelte
 				</code>
 			</div>
 		</div>

@@ -769,7 +769,7 @@ export const EXT_HIGHLIGHT = `\
 export const EXT_COMPOSED_DEMO = `<script lang="ts">
   import * as Editable from '@editable-kit/svelte';
   import type { Extensions, Editor } from '@tiptap/core';
-  import type { JSONContent } from 'editable-kit/types';
+  import type { JSONContent } from '@editable-kit/core/types';
   import { highlight } from '$lib/highlight.js';
 
   let editing = $state(false);
@@ -841,7 +841,7 @@ type CalloutNode = {
   content?: PMNode[];
 };
 
-declare module 'editable-kit/types' {
+declare module '@editable-kit/core/types' {
   interface NodeTypes {
     callout: CalloutNode;
   }

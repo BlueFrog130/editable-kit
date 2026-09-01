@@ -44,16 +44,16 @@
 			<Tabs.Trigger value="bun" class="px-2 py-0.5 text-xs">bun</Tabs.Trigger>
 		</Tabs.List>
 		<Tabs.Content value="pnpm">
-			<Code lang="bash" code="pnpm add editable-kit svelte" />
+			<Code lang="bash" code="pnpm add @editable-kit/svelte svelte" />
 		</Tabs.Content>
 		<Tabs.Content value="npm">
-			<Code lang="bash" code="npm install editable-kit svelte" />
+			<Code lang="bash" code="npm install @editable-kit/svelte svelte" />
 		</Tabs.Content>
 		<Tabs.Content value="yarn">
-			<Code lang="bash" code="yarn add editable-kit svelte" />
+			<Code lang="bash" code="yarn add @editable-kit/svelte svelte" />
 		</Tabs.Content>
 		<Tabs.Content value="bun">
-			<Code lang="bash" code="bun add editable-kit svelte" />
+			<Code lang="bash" code="bun add @editable-kit/svelte svelte" />
 		</Tabs.Content>
 	</Tabs.Root>
 </section>

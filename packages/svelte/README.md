@@ -255,7 +255,7 @@ import type { PMNode } from '@editable-kit/svelte';
 
 type CalloutNode = { type: 'callout'; attrs: { tone: 'info' | 'warn' }; content?: PMNode[] };
 
-declare module '@editable-kit/core' {
+declare module '@editable-kit/core/types' {
 	interface NodeTypes {
 		callout: CalloutNode;
 	}
@@ -306,24 +306,16 @@ import { text, paragraphs, image, imageAttrs } from '@editable-kit/svelte'; // d
 import { Renderer } from '@editable-kit/svelte/renderer';
 
 // The node/mark type registries, to augment for your own extensions
-declare module '@editable-kit/core' {
+declare module '@editable-kit/core/types' {
 	/* interface NodeTypes { ... } */
 }
 ```
 
 ## Development
 
-```bash
-pnpm install          # Install dependencies
-pnpm dev              # Start dev server
-pnpm build            # Build app + library
-pnpm package          # Package library only
-pnpm check            # Type check
-pnpm test             # Run tests
-pnpm lint             # Check formatting
-pnpm format           # Auto-format
-```
+This package lives in the [editable-kit monorepo](https://github.com/BlueFrog130/editable-kit) —
+clone it and run `pnpm install`, then `pnpm dev` for the docs site.
 
 ## License
 
-[MIT](LICENSE) — Made by [BlueFrog130](https://github.com/BlueFrog130)
+[MIT](https://github.com/BlueFrog130/editable-kit/blob/main/LICENSE) — Made by [BlueFrog130](https://github.com/BlueFrog130)
