@@ -1,0 +1,9 @@
+// Bindings for the test runner (@cloudflare/vitest-pool-workers). Consumers write their
+// own — the package never assumes a binding name.
+{
+	"name": "editable-kit-cloudflare",
+	"compatibility_date": "2026-07-05",
+	"compatibility_flags": ["nodejs_compat"],
+	"d1_databases": [{ "binding": "DB", "database_name": "test", "database_id": "test" }],
+	"r2_buckets": [{ "binding": "BUCKET", "bucket_name": "test" }]
+}

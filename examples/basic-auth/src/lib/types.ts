@@ -1,17 +1,17 @@
-import type { ProseMirrorJSON, ImageState } from 'editable-kit';
+import type { ProseMirrorJSON } from '@editable-kit/svelte';
 import * as v from 'valibot';
 
 export type ProjectData = {
 	title: ProseMirrorJSON;
 	desc: ProseMirrorJSON;
-	image: ImageState;
+	image: ProseMirrorJSON;
 };
 
 export type Data = {
 	// Hero
 	name: ProseMirrorJSON;
 	tagline: ProseMirrorJSON;
-	avatar: ImageState;
+	avatar: ProseMirrorJSON;
 	bio: ProseMirrorJSON;
 
 	// About
@@ -25,28 +25,17 @@ export type Data = {
 };
 
 export const JSONSchema = v.record(v.string(), v.any());
-export const ImageSchema = v.union([
-	v.object({
-		image: v.instance(ArrayBuffer),
-		alt: v.string()
-	}),
-	v.object({
-		src: v.string(),
-		alt: v.string()
-	})
-]);
-
 export const projectSchema = v.object({
 	title: JSONSchema,
 	desc: JSONSchema,
-	image: ImageSchema
+	image: JSONSchema
 });
 
 export const dataSchema = v.object({
 	// Hero
 	name: JSONSchema,
 	tagline: JSONSchema,
-	avatar: ImageSchema,
+	avatar: JSONSchema,
 	bio: JSONSchema,
 
 	// About

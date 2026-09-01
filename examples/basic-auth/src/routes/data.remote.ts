@@ -1,16 +1,9 @@
 import { command, getRequestEvent, query } from '$app/server';
 import { verifySessionToken, COOKIE_NAME } from '$lib/server/auth';
 import { load, save } from '$lib/server/db';
-import { saveImage } from '$lib/server/images';
-import { dataSchema, ImageSchema, type Data, type ProjectData } from '$lib/types';
-import type { ProseMirrorJSON } from 'editable-kit';
-import type { InferInput } from 'valibot';
+import { dataSchema, type Data } from '$lib/types';
 
-export const getData = query(async () => {
-	const data = await load();
-	console.log(data);
-	return data;
-});
+export const getData = query(async () => load());
 
 export const updateData = command(dataSchema, async (data) => {
 	const { cookies } = getRequestEvent();
@@ -20,31 +13,9 @@ export const updateData = command(dataSchema, async (data) => {
 		throw new Error('Unauthorized');
 	}
 
-	await save({
-		...(data as Data),
-		avatar: await handleImg(data.avatar),
-		projects: await Promise.all(
-			data.projects.map(async (project) => ({
-				image: await handleImg(project.image),
-				title: project.title as ProseMirrorJSON,
-				desc: project.desc as ProseMirrorJSON
-			}))
-		)
-	});
+	// Images are uploaded via /api/images when picked, so every field is already a URL.
+	// Every field is a ProseMirror document now, images included — nothing to remap.
+	await save(data as Data);
 
 	await getData().refresh();
 });
-
-async function handleImg(img: InferInput<typeof ImageSchema>) {
-	if ('image' in img) {
-		return {
-			src: await saveImage(img.image),
-			alt: img.alt
-		};
-	}
-
-	return {
-		src: img.src,
-		alt: img.alt
-	};
-}

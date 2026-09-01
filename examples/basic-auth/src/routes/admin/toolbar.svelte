@@ -1,6 +1,7 @@
 <script lang="ts">
-	import type { EditableState, SaveResult } from 'editable-kit';
+	import { pickFile, type EditableState } from '@editable-kit/svelte';
 	import { enhance } from '$app/forms';
+	import { upload } from '$lib';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
@@ -11,7 +12,7 @@
 		state: editState
 	}: {
 		oncancel: () => unknown;
-		onsave: () => Promise<SaveResult>;
+		onsave: () => Promise<void>;
 		state: EditableState | undefined;
 	} = $props();
 
@@ -89,7 +90,7 @@
 			S
 		</Button>
 
-		{#if editState.isImage}
+		{#if editState.isActive('image')}
 			<div class="mx-1 h-4 w-px bg-border"></div>
 
 			{#if editingSrc}
@@ -98,7 +99,7 @@
 					onsubmit={(e) => {
 						e.preventDefault();
 						if (srcValue.trim()) {
-							editState.setImageSrc(srcValue.trim());
+							editState.run((e) => e.chain().focus().setImage({ src: srcValue.trim() }).run());
 						}
 						editingSrc = false;
 						srcValue = '';
@@ -126,7 +127,14 @@
 						{/snippet}
 					</DropdownMenu.Trigger>
 					<DropdownMenu.Content align="start">
-						<DropdownMenu.Item onclick={() => editState.replaceImage()}>
+						<DropdownMenu.Item
+							onclick={async () => {
+								const file = await pickFile();
+								if (!file) return;
+								const src = await upload(file);
+								editState.run((e) => e.chain().focus().setImage({ src }).run());
+							}}
+						>
 							Upload file
 						</DropdownMenu.Item>
 						<DropdownMenu.Item onclick={() => (editingSrc = true)}>From URL</DropdownMenu.Item>
@@ -139,7 +147,9 @@
 					class="flex items-center gap-1"
 					onsubmit={(e) => {
 						e.preventDefault();
-						editState.setImageAlt(altValue);
+						editState.run((e) =>
+							e.chain().focus().updateAttributes('image', { alt: altValue }).run()
+						);
 						editingAlt = false;
 					}}
 				>
@@ -160,7 +170,7 @@
 					size="sm"
 					class="px-2.5 text-xs"
 					onclick={() => {
-						altValue = editState.getImageAlt() ?? '';
+						altValue = editState.editor?.getAttributes('image').alt ?? '';
 						editingAlt = true;
 					}}
 				>

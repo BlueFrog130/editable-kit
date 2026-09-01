@@ -1,0 +1,49 @@
+{
+	"name": "editable-kit",
+	"version": "1.0.0",
+	"description": "Deprecated — renamed to @editable-kit/svelte. This package re-exports it.",
+	"keywords": [
+		"deprecated",
+		"editable-kit",
+		"svelte"
+	],
+	"author": "BlueFrog130",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/BlueFrog130/editable-kit.git",
+		"directory": "packages/editable-kit"
+	},
+	"homepage": "https://github.com/BlueFrog130/editable-kit",
+	"bugs": {
+		"url": "https://github.com/BlueFrog130/editable-kit/issues"
+	},
+	"type": "module",
+	"exports": {
+		".": {
+			"types": "./src/index.d.ts",
+			"svelte": "./src/index.js",
+			"default": "./src/index.js"
+		},
+		"./renderer": {
+			"types": "./src/renderer.d.ts",
+			"svelte": "./src/renderer.js",
+			"default": "./src/renderer.js"
+		}
+	},
+	"types": "./src/index.d.ts",
+	"svelte": "./src/index.js",
+	"files": [
+		"src",
+		"README.md"
+	],
+	"scripts": {
+		"check": "tsc --noEmit"
+	},
+	"dependencies": {
+		"@editable-kit/svelte": "workspace:^"
+	},
+	"devDependencies": {
+		"typescript": "^5.9.3"
+	}
+}

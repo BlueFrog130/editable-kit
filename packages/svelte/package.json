@@ -1,0 +1,113 @@
+{
+	"name": "@editable-kit/svelte",
+	"version": "0.0.0",
+	"description": "Svelte 5 inline editing — editable text, rich text (TipTap), and images, bound straight at your data",
+	"keywords": [
+		"svelte",
+		"svelte5",
+		"sveltekit",
+		"inline-editing",
+		"contenteditable",
+		"rich-text",
+		"tiptap",
+		"wysiwyg",
+		"image-editor",
+		"image-cropping",
+		"component-library",
+		"editable",
+		"prosemirror"
+	],
+	"author": "BlueFrog130",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/BlueFrog130/editable-kit.git",
+		"directory": "packages/svelte"
+	},
+	"homepage": "https://github.com/BlueFrog130/editable-kit",
+	"bugs": {
+		"url": "https://github.com/BlueFrog130/editable-kit/issues"
+	},
+	"type": "module",
+	"scripts": {
+		"build": "pnpm package",
+		"build:site": "vite build && node scripts/generate-llms-txt.js",
+		"dev": "vite dev",
+		"preview": "vite preview",
+		"package": "svelte-kit sync && svelte-package && publint",
+		"prepublishOnly": "pnpm package",
+		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+		"test": "vitest",
+		"release": "pnpm check && pnpm test run && pnpm package"
+	},
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"svelte": "./dist/index.js"
+		},
+		"./renderer": {
+			"types": "./dist/components/renderer/index.d.ts",
+			"svelte": "./dist/components/renderer/index.js"
+		}
+	},
+	"files": [
+		"dist",
+		"!dist/**/*.test.*",
+		"!dist/**/*.spec.*"
+	],
+	"svelte": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"peerDependencies": {
+		"svelte": "^5.0.0-next.1"
+	},
+	"dependencies": {
+		"@editable-kit/core": "workspace:^",
+		"@tiptap/core": "catalog:"
+	},
+	"devDependencies": {
+		"@editable-kit/core": "workspace:^",
+		"@floating-ui/dom": "^1.8.0",
+		"@internationalized/date": "^3.12.3",
+		"@lucide/svelte": "^1.33.0",
+		"@shikijs/langs": "^4.4.3",
+		"@shikijs/themes": "^4.4.3",
+		"@sveltejs/adapter-auto": "^7.0.1",
+		"@sveltejs/adapter-static": "^3.0.10",
+		"@sveltejs/kit": "^2.70.3",
+		"@sveltejs/package": "^2.5.8",
+		"@sveltejs/vite-plugin-svelte": "^7.3.0",
+		"@tailwindcss/typography": "^0.5.20",
+		"@tailwindcss/vite": "^4.3.3",
+		"@testing-library/jest-dom": "^7.0.1",
+		"@testing-library/svelte": "^5.4.2",
+		"@tiptap/extension-code-block": "catalog:",
+		"@tiptap/extension-drag-handle": "catalog:",
+		"@tiptap/extension-file-handler": "catalog:",
+		"@tiptap/extension-heading": "catalog:",
+		"@tiptap/extension-highlight": "catalog:",
+		"@tiptap/extension-task-item": "catalog:",
+		"@tiptap/extension-task-list": "catalog:",
+		"@tiptap/starter-kit": "catalog:",
+		"@types/node": "^26.2.0",
+		"@types/turndown": "^5.0.6",
+		"bits-ui": "^2.18.2",
+		"clsx": "^2.1.1",
+		"jsdom": "^30.0.1",
+		"publint": "^0.3.24",
+		"shiki": "^4.4.3",
+		"svelte": "5.56.9",
+		"svelte-check": "^4.7.6",
+		"tailwind-merge": "^3.6.0",
+		"tailwind-variants": "^3.3.1",
+		"tailwindcss": "^4.3.3",
+		"tiptap-extension-code-block-shiki": "^1.2.0",
+		"tslib": "^2.8.1",
+		"turndown": "^7.2.4",
+		"tw-animate-css": "^1.4.0",
+		"typescript": "^5.9.3",
+		"vite": "^8.2.1",
+		"vite-plugin-devtools-json": "^1.1.0",
+		"vitest": "^4.1.11"
+	}
+}

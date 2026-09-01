@@ -1,6 +1,8 @@
 {
-	"name": "editable-kit",
-	"packageManager": "pnpm@10.32.1",
+	"name": "editable-kit-monorepo",
+	"private": true,
+	"type": "module",
+	"packageManager": "pnpm@11.21.0",
 	"version": "0.3.0",
 	"description": "Svelte 5 component library for inline editing — editable text, rich text (TipTap), and images with cropping",
 	"keywords": [
@@ -29,110 +31,24 @@
 		"url": "https://github.com/BlueFrog130/editable-kit/issues"
 	},
 	"scripts": {
-		"dev": "vite dev",
-		"build": "vite build && node scripts/generate-llms-txt.js && npm run package",
-		"preview": "vite preview",
-		"package": "svelte-kit sync && svelte-package && publint",
-		"prepublishOnly": "npm run package",
-		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-		"test": "vitest",
-		"lint": "prettier --check .",
-		"format": "prettier --write .",
+		"dev": "pnpm --filter @editable-kit/svelte dev",
+		"build": "pnpm -r build",
+		"build:packages": "pnpm --filter \"./packages/**\" build",
+		"build:site": "pnpm --filter @editable-kit/svelte build:site",
+		"package": "pnpm --filter @editable-kit/svelte package",
+		"check": "pnpm --filter \"./packages/**\" check",
+		"test": "pnpm -r test run",
+		"lint": "oxlint && oxfmt --check",
+		"format": "oxfmt",
 		"changeset": "changeset",
-		"release": "pnpm lint && pnpm check && pnpm test run && pnpm package && npm publish --access public"
-	},
-	"exports": {
-		".": {
-			"types": "./dist/index.d.ts",
-			"svelte": "./dist/index.js"
-		},
-		"./editable": {
-			"types": "./dist/components/editable/index.d.ts",
-			"svelte": "./dist/components/editable/index.js"
-		},
-		"./editors": {
-			"types": "./dist/components/editors/index.d.ts",
-			"svelte": "./dist/components/editors/index.js"
-		},
-		"./renderer": {
-			"types": "./dist/components/renderer/index.d.ts",
-			"svelte": "./dist/components/renderer/index.js"
-		}
-	},
-	"files": [
-		"dist",
-		"!dist/**/*.test.*",
-		"!dist/**/*.spec.*"
-	],
-	"peerDependencies": {
-		"svelte": "^5.0.0-next.1"
+		"release": "pnpm build:packages && changeset publish"
 	},
 	"devDependencies": {
-		"@changesets/changelog-github": "^0.6.0",
-		"@changesets/cli": "^2.31.0",
-		"@floating-ui/dom": "^1.7.6",
-		"@internationalized/date": "^3.12.1",
-		"@lucide/svelte": "^0.575.0",
-		"@shikijs/langs": "^4.0.2",
-		"@shikijs/themes": "^4.0.2",
-		"@sveltejs/adapter-auto": "^7.0.1",
-		"@sveltejs/adapter-static": "^3.0.10",
-		"@sveltejs/kit": "^2.59.1",
-		"@sveltejs/package": "^2.5.7",
-		"@sveltejs/vite-plugin-svelte": "^6.2.4",
-		"@tailwindcss/typography": "^0.5.19",
-		"@tailwindcss/vite": "^4.3.0",
-		"@testing-library/jest-dom": "^6.9.1",
-		"@testing-library/svelte": "^5.3.1",
-		"@types/node": "^25.7.0",
-		"@types/turndown": "^5.0.6",
-		"bits-ui": "^2.18.1",
-		"clsx": "^2.1.1",
-		"jsdom": "^28.1.0",
-		"lucide-svelte": "^1.0.1",
-		"prettier": "^3.8.3",
-		"prettier-plugin-svelte": "^3.5.2",
-		"prettier-plugin-tailwindcss": "^0.7.4",
-		"publint": "^0.3.21",
-		"shiki": "^4.0.2",
-		"svelte": "5.53.5",
-		"svelte-check": "^4.4.8",
-		"tailwind-merge": "^3.6.0",
-		"tailwind-variants": "^3.2.2",
-		"tailwindcss": "^4.3.0",
-		"tslib": "^2.8.1",
-		"turndown": "^7.2.4",
-		"tw-animate-css": "^1.4.0",
-		"typescript": "^5.9.3",
-		"vite": "^7.3.3",
-		"vite-plugin-devtools-json": "^1.0.0",
-		"vitest": "^4.1.6"
-	},
-	"svelte": "./dist/index.js",
-	"types": "./dist/index.d.ts",
-	"type": "module",
-	"dependencies": {
-		"@tiptap/core": "^3.23.4",
-		"@tiptap/extension-blockquote": "^3.23.4",
-		"@tiptap/extension-bold": "^3.23.4",
-		"@tiptap/extension-bullet-list": "^3.23.4",
-		"@tiptap/extension-document": "^3.23.4",
-		"@tiptap/extension-dropcursor": "^3.23.4",
-		"@tiptap/extension-gapcursor": "^3.23.4",
-		"@tiptap/extension-hard-break": "^3.23.4",
-		"@tiptap/extension-heading": "^3.23.4",
-		"@tiptap/extension-history": "^3.23.4",
-		"@tiptap/extension-image": "^3.23.4",
-		"@tiptap/extension-italic": "^3.23.4",
-		"@tiptap/extension-link": "^3.23.4",
-		"@tiptap/extension-list-item": "^3.23.4",
-		"@tiptap/extension-ordered-list": "^3.23.4",
-		"@tiptap/extension-paragraph": "^3.23.4",
-		"@tiptap/extension-placeholder": "^3.23.4",
-		"@tiptap/extension-strike": "^3.23.4",
-		"@tiptap/extension-text": "^3.23.4",
-		"@tiptap/extension-underline": "^3.23.4",
-		"@tiptap/pm": "^3.23.4"
+		"@changesets/changelog-github": "^1.0.0",
+		"@changesets/cli": "^3.0.0",
+		"oxfmt": "^0.63.0",
+		"oxlint": "^1.78.0",
+		"svelte": "^5.56.9",
+		"tw-animate-css": "^1.4.0"
 	}
 }
