@@ -5,13 +5,13 @@ that already rendered your content, so edit mode adds no box.
 
 ## Packages
 
-| Path                          | Package                            | Description                                                                                             |
-| ----------------------------- | ---------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| `packages/core`               | `@editable-kit/core`               | Framework-agnostic: document types, TipTap extension sets, the field editor lifecycle. No UI framework. |
-| `packages/svelte`             | `@editable-kit/svelte`             | The Svelte 5 components + the docs/demo site (GitHub Pages). Re-exports all of core.                    |
-| `packages/editable-kit`       | `editable-kit`                     | Deprecated. Re-exports `@editable-kit/svelte` so existing installs keep working.                        |
-| `examples/basic-auth`         | `basic-auth`                       | Example app — session auth, local disk storage.                                                         |
-| `examples/cloudflare`         | `cloudflare-example`               | Example app — Workers, content and images in R2.                                                        |
+| Path                    | Package                | Description                                                                                             |
+| ----------------------- | ---------------------- | ------------------------------------------------------------------------------------------------------- |
+| `packages/core`         | `@editable-kit/core`   | Framework-agnostic: document types, TipTap extension sets, the field editor lifecycle. No UI framework. |
+| `packages/svelte`       | `@editable-kit/svelte` | The Svelte 5 components + the docs/demo site (GitHub Pages). Re-exports all of core.                    |
+| `packages/editable-kit` | `editable-kit`         | Deprecated. Re-exports `@editable-kit/svelte` so existing installs keep working.                        |
+| `examples/basic-auth`   | `basic-auth`           | Example app — session auth, local disk storage.                                                         |
+| `examples/cloudflare`   | `cloudflare-example`   | Example app — Workers, content and images in R2.                                                        |
 
 Everything framework-agnostic lives in `core`; only `svelte` depends on a UI framework. The graph
 is a line:
