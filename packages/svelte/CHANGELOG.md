@@ -1,5 +1,13 @@
 # editable-kit
 
+## 1.0.1
+
+### Patch Changes
+
+- [#19](https://github.com/BlueFrog130/editable-kit/pull/19) [`86e9a05`](https://github.com/BlueFrog130/editable-kit/commit/86e9a05dda109ed4d20a3a84d44ff9feff20e171) Thanks [@BlueFrog130](https://github.com/BlueFrog130)! - Docs: install snippets now name `@editable-kit/svelte`, and the type-augmentation
+  examples name `@editable-kit/core/types` — augmenting the `@editable-kit/core`
+  barrel (or the old `editable-kit/types`) registers nothing.
+
 ## 1.0.0
 
 ### Major Changes
