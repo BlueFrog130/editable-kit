@@ -36,7 +36,7 @@
 		"build:packages": "pnpm --filter \"./packages/**\" build",
 		"build:site": "pnpm --filter @editable-kit/svelte build:site",
 		"package": "pnpm --filter @editable-kit/svelte package",
-		"check": "pnpm -r check",
+		"check": "pnpm --filter \"./packages/**\" check",
 		"test": "pnpm -r test run",
 		"lint": "oxlint && oxfmt --check",
 		"format": "oxfmt",
