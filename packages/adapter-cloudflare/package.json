@@ -1,6 +1,6 @@
 {
 	"name": "@editable-kit/adapter-cloudflare",
-	"version": "0.0.0",
+	"version": "1.0.0",
 	"description": "Cloudflare backend for editable-kit — D1 content records, content-addressed R2 assets, framework-agnostic Request/Response handlers",
 	"type": "module",
 	"exports": {
