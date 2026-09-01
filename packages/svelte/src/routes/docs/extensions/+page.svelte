@@ -533,8 +533,8 @@
 	</p>
 
 	<p class="mt-6 mb-3 text-sm text-muted-foreground">
-		Augment <code class="rounded bg-muted px-1.5 py-0.5 font-mono">editable-kit/types</code>, the
-		module that declares the two registries:
+		Augment <code class="rounded bg-muted px-1.5 py-0.5 font-mono">@editable-kit/core/types</code>,
+		the module that declares the two registries:
 	</p>
 	<Code code={EXT_AUGMENT_TYPES} />
 
