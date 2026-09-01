@@ -11,9 +11,10 @@
 	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
+	import { building } from '$app/env';
 
 	let data: DemoSiteData = $state(DEFAULT_DATA);
-	let editing = $derived(page.url.searchParams.get('editing') === '1');
+	let editing = $derived(building ? false : page.url.searchParams.get('editing') === '1');
 
 	$effect.pre(() => {
 		if (browser) {

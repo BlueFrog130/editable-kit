@@ -62,11 +62,11 @@
 		"svelte": "^5.0.0-next.1"
 	},
 	"dependencies": {
-		"@editable-kit/core": "workspace:*",
+		"@editable-kit/core": "workspace:^",
 		"@tiptap/core": "catalog:"
 	},
 	"devDependencies": {
-		"@editable-kit/core": "workspace:*",
+		"@editable-kit/core": "workspace:^",
 		"@floating-ui/dom": "^1.8.0",
 		"@internationalized/date": "^3.12.3",
 		"@lucide/svelte": "^1.33.0",

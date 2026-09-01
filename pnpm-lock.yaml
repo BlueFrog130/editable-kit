@@ -314,7 +314,7 @@ importers:
   packages/editable-kit:
     dependencies:
       '@editable-kit/svelte':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../svelte
     devDependencies:
       typescript:
@@ -324,7 +324,7 @@ importers:
   packages/svelte:
     dependencies:
       '@editable-kit/core':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../core
       '@tiptap/core':
         specifier: 'catalog:'

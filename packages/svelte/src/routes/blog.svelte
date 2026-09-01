@@ -4,6 +4,7 @@
 	import { PlainText, Renderer } from '$lib/components/renderer/index.js';
 	import type { BlogPostData } from '@routes/types.js';
 	import { page } from '$app/state';
+	import { building } from '$app/env';
 
 	let {
 		data,
@@ -15,7 +16,12 @@
 		onaddpost: () => void;
 	} = $props();
 
-	$inspect(...page.url.searchParams.entries());
+	const blogPath = $derived.by((): `/blog/[id]` | `/blog/[id]?${string}` => {
+		if (building) return '/blog/[id]';
+
+		const query = page.url.searchParams.toString();
+		return query ? (`/blog/[id]?${query}` as `/blog/[id]?${string}`) : '/blog/[id]';
+	});
 </script>
 
 <section class="py-24">
@@ -32,10 +38,7 @@
 
 		{#if data.length > 0}
 			<a
-				href={resolve(
-					page.url.searchParams.size > 0 ? `/blog/[id]?${page.url.searchParams}` : '/blog/[id]',
-					{ id: data[0].id }
-				)}
+				href={resolve(blogPath, { id: data[0].id })}
 				class="group/featured mb-8 block"
 				data-ek-keep
 			>
@@ -76,14 +79,7 @@
 		{#if data.length > 1}
 			<div class="grid gap-6 sm:grid-cols-2">
 				{#each data.slice(1) as post, i (post.id)}
-					<a
-						href={resolve(
-							page.url.searchParams.size > 0 ? `/blog/[id]?${page.url.searchParams}` : '/blog/[id]',
-							{ id: post.id }
-						)}
-						class="group/card block"
-						data-ek-keep
-					>
+					<a href={resolve(blogPath, { id: post.id })} class="group/card block" data-ek-keep>
 						<article
 							class="h-full overflow-hidden rounded-xl border border-border bg-card shadow-sm transition-shadow hover:shadow-md"
 						>

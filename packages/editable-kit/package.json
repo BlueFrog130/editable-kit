@@ -41,7 +41,7 @@
 		"check": "tsc --noEmit"
 	},
 	"dependencies": {
-		"@editable-kit/svelte": "workspace:*"
+		"@editable-kit/svelte": "workspace:^"
 	},
 	"devDependencies": {
 		"typescript": "^5.9.3"

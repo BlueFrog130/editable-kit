@@ -33,6 +33,54 @@ declare module '@editable-kit/core/types' {
 }
 ```
 
+## Releasing
+
+Changesets, unchanged by the split. `core` and `svelte` are `linked` in `.changeset/config.json`, so
+they always carry the same version; `adapter-cloudflare` versions independently.
+
+```bash
+pnpm changeset      # describe the change, pick the packages
+git commit && push  # merge to main
+```
+
+The Release workflow opens a "Version Packages" PR. Merging it runs `pnpm release`
+(`build:packages && changeset publish`), which publishes whatever versions are not yet on npm and
+pushes the git tags.
+
+Two mechanisms do work at pack time, so what you publish is not what sits in the repo:
+
+- `publishConfig.exports` in `core` and `adapter-cloudflare` swaps the source-resolved `exports` for
+  compiled `dist`. Consumers never receive TypeScript.
+- `workspace:^` and `catalog:` are replaced with real semver ranges.
+
+Verify either with `pnpm pack` in the package directory and reading the `package.json` inside the
+tarball — that is exactly what npm would receive.
+
+### First release only
+
+The three scoped packages have never been published, so this run needs a few things the steady
+state does not:
+
+1. **npm auth.** `.github/workflows/publish.yml` sets `id-token: write` and a `publish`
+   environment but passes no `NODE_AUTH_TOKEN`, which means it is set up for npm
+   [trusted publishing](https://docs.npmjs.com/trusted-publishers) rather than a token. Trusted
+   publishing is configured **per package on npmjs.com and the package has to exist first**, so
+   either publish each package once by hand, or add an `NPM_TOKEN` secret and
+   `NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}` to that step for the first run.
+2. **Scope access.** `"access": "public"` is already set in the changesets config, which is what
+   keeps scoped packages from defaulting to private.
+3. **The deprecated shim is not published by CI.** `editable-kit` is in the changesets `ignore`
+   list, and `ignore` skips publishing, not just versioning. Publish it once by hand, after
+   `@editable-kit/svelte` is on npm so its `workspace:^` range resolves to a real version:
+
+   ```bash
+   pnpm --filter editable-kit publish --access public
+   npm deprecate editable-kit "renamed to @editable-kit/svelte"
+   ```
+
+   It stays at 1.0.0 and depends on `@editable-kit/svelte@^1.0.0`, so it keeps working across the
+   whole 1.x line without being republished. It will not follow a 2.0 — retire it then.
+
 ## Commands (run from repo root)
 
 - `pnpm dev` — run the docs/demo app (from `packages/svelte`)
