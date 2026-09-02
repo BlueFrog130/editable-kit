@@ -188,8 +188,8 @@
 
 		<Tabs.Content value="rich" class="mt-4">
 			<p class="mb-4 text-sm text-muted-foreground">
-				The full editing suite. Includes everything from multiline plus marks, block types, lists,
-				and media.
+				The full text editing suite. Includes everything from multiline plus marks, block types, and
+				lists. Media is not included &mdash; add an image node yourself, as shown below.
 			</p>
 			<div class="space-y-1">
 				<p class="mb-2 text-[10px] font-medium tracking-[0.2em] text-muted-foreground uppercase">
@@ -357,17 +357,6 @@
 							>Individual list entry. Required by both list types.</span
 						>
 					</div>
-					<div class="flex items-start gap-3 rounded-md border border-border px-3 py-2.5">
-						<a
-							href="https://tiptap.dev/docs/editor/extensions/nodes/image"
-							class="shrink-0 font-mono text-sm font-medium underline decoration-muted-foreground/50 underline-offset-2 transition-colors hover:decoration-foreground"
-							target="_blank"
-							rel="noopener noreferrer">Image</a
-						>
-						<span class="text-sm text-muted-foreground"
-							>Inline images within rich text content.</span
-						>
-					</div>
 				</div>
 
 				<p
@@ -384,29 +373,6 @@
 							rel="noopener noreferrer">History</a
 						>
 						<span class="text-sm text-muted-foreground">Undo / redo.</span>
-					</div>
-					<div class="flex items-start gap-3 rounded-md border border-border px-3 py-2.5">
-						<a
-							href="https://tiptap.dev/docs/editor/extensions/functionality/dropcursor"
-							class="shrink-0 font-mono text-sm font-medium underline decoration-muted-foreground/50 underline-offset-2 transition-colors hover:decoration-foreground"
-							target="_blank"
-							rel="noopener noreferrer">Dropcursor</a
-						>
-						<span class="text-sm text-muted-foreground"
-							>Visual indicator when dragging content between blocks.</span
-						>
-					</div>
-					<div class="flex items-start gap-3 rounded-md border border-border px-3 py-2.5">
-						<a
-							href="https://tiptap.dev/docs/editor/extensions/functionality/gapcursor"
-							class="shrink-0 font-mono text-sm font-medium underline decoration-muted-foreground/50 underline-offset-2 transition-colors hover:decoration-foreground"
-							target="_blank"
-							rel="noopener noreferrer">Gapcursor</a
-						>
-						<span class="text-sm text-muted-foreground"
-							>Allows cursor placement in positions that are normally inaccessible (e.g. after an
-							image).</span
-						>
 					</div>
 					<div class="flex items-start gap-3 rounded-md border border-border px-3 py-2.5">
 						<a
@@ -439,14 +405,19 @@
 		Every text snippet accepts a <code class="rounded bg-muted px-1.5 py-0.5 font-mono text-sm"
 			>TextEditorOptions</code
 		>
-		object as its second argument. Use it to swap, extend, or replace the default extension set.
+		object as its second argument. Anything you pass to
+		<code class="rounded bg-muted px-1.5 py-0.5 font-mono text-sm">extensions</code> replaces the
+		variant defaults outright — no merging, no name collisions to reason about. Pull the defaults in
+		yourself with
+		<code class="rounded bg-muted px-1.5 py-0.5 font-mono text-sm">defaultExtensions(variant)</code>
+		when you want to build on top of them.
 	</p>
 
 	<Tabs.Root value="placeholder">
 		<Tabs.List>
 			<Tabs.Trigger value="placeholder">Placeholder</Tabs.Trigger>
 			<Tabs.Trigger value="extend">Extend Defaults</Tabs.Trigger>
-			<Tabs.Trigger value="replace">Replace All</Tabs.Trigger>
+			<Tabs.Trigger value="replace">Skip the Defaults</Tabs.Trigger>
 			<Tabs.Trigger value="advanced">Custom Extension</Tabs.Trigger>
 		</Tabs.List>
 
@@ -459,21 +430,26 @@
 
 		<Tabs.Content value="extend" class="mt-4">
 			<p class="mb-3 text-sm text-muted-foreground">
-				Receive the defaults array and append your own extensions.
+				Whatever you pass <em>is</em> the extension list — there is no merging. Ask
+				<code class="rounded bg-muted px-1.5 py-0.5 font-mono text-xs">defaultExtensions</code>
+				for the variant's own set and add to it; it resolves in parallel with everything else.
 			</p>
 			<Code code={EXT_EXTEND_DEFAULTS} />
 		</Tabs.Content>
 
 		<Tabs.Content value="replace" class="mt-4">
 			<p class="mb-3 text-sm text-muted-foreground">
-				Return a completely new array to replace every default extension.
+				Leave <code class="rounded bg-muted px-1.5 py-0.5 font-mono text-xs">defaultExtensions</code
+				>
+				out of the list and the defaults are never loaded at all.
 			</p>
 			<Code code={EXT_REPLACE_ALL} />
 		</Tabs.Content>
 
 		<Tabs.Content value="advanced" class="mt-4">
 			<p class="mb-3 text-sm text-muted-foreground">
-				Extend a built-in extension with custom attributes or keyboard shortcuts.
+				Extend a built-in extension with custom attributes or keyboard shortcuts, then map it over
+				the default of the same name.
 			</p>
 			<Code code={EXT_CUSTOM} />
 		</Tabs.Content>
@@ -483,8 +459,7 @@
 		<p class="text-sm font-medium">TextEditorOptions</p>
 		<div class="mt-3 space-y-2 font-mono text-sm text-muted-foreground">
 			<p>
-				<span class="text-foreground">extensions?</span>: (defaults: Extensions) =&gt; Extensions |
-				Promise&lt;Extensions&gt;
+				<span class="text-foreground">extensions?</span>: Extensions | Promise&lt;Extensions&gt;
 			</p>
 			<p><span class="text-foreground">placeholder?</span>: string</p>
 			<p>
@@ -536,7 +511,7 @@
 		Augment <code class="rounded bg-muted px-1.5 py-0.5 font-mono">@editable-kit/core/types</code>,
 		the module that declares the two registries:
 	</p>
-	<Code code={EXT_AUGMENT_TYPES} />
+	<Code code={EXT_AUGMENT_TYPES} lang="ts" />
 
 	<p class="mt-6 mb-3 text-sm text-muted-foreground">
 		Every override snippet for that key is now typed with your node, and
@@ -578,11 +553,17 @@
 		for users who never edit.
 	</p>
 	<p class="mb-6 text-muted-foreground">
-		The <code class="rounded bg-muted px-1.5 py-0.5 font-mono text-sm">extensions</code> callback
-		can be <code class="rounded bg-muted px-1.5 py-0.5 font-mono text-sm">async</code>, so you can
-		use dynamic <code class="rounded bg-muted px-1.5 py-0.5 font-mono text-sm">import()</code> to keep
-		custom extensions in the same lazy chunk as the editor. They'll only be fetched when the editor actually
-		mounts.
+		<code class="rounded bg-muted px-1.5 py-0.5 font-mono text-sm">extensions</code> takes a
+		promise, so a dynamic
+		<code class="rounded bg-muted px-1.5 py-0.5 font-mono text-sm">import()</code> keeps custom
+		extensions in the same lazy chunk as the editor. Build that promise when
+		<code class="rounded bg-muted px-1.5 py-0.5 font-mono text-sm">editing</code> turns on rather
+		than at render — the request then goes out alongside TipTap's own, and read-only visitors never
+		make it.
+		<code class="rounded bg-muted px-1.5 py-0.5 font-mono text-sm">defaultExtensions()</code> is one
+		more promise to put in the same
+		<code class="rounded bg-muted px-1.5 py-0.5 font-mono text-sm">Promise.all</code>, so pulling in
+		the variant defaults costs no extra round trip.
 	</p>
 
 	<div class="grid gap-4 md:grid-cols-2">
@@ -609,7 +590,7 @@
 			</div>
 			<Code code={EXT_DYNAMIC_IMPORT} />
 			<p class="mt-2 text-xs text-muted-foreground">
-				Extensions are code-split into a separate chunk and only fetched when the editor mounts.
+				Extensions are code-split into a separate chunk, fetched on the first toggle into edit mode.
 			</p>
 		</div>
 	</div>
@@ -629,30 +610,52 @@
 
 <Separator class="my-12" />
 
-<!-- Three extensions at once -->
+<!-- Image support via extensions -->
 <section class="mb-16">
-	<h2 class="font-serif text-2xl tracking-tight">Three Extensions at Once</h2>
+	<h2 class="font-serif text-2xl tracking-tight">Adding Image Support</h2>
 	<p class="mt-3 mb-6 text-muted-foreground">
-		A rich field with <a
-			href="https://tiptap.dev/docs/editor/extensions/functionality/drag-handle"
+		The rich field is text only, so images are yours to add. This one brings back <code
+			class="rounded bg-muted px-1.5 py-0.5 font-mono text-sm">EkImage</code
+		>
+		(the kit's image node, which keeps intrinsic <code class="font-mono text-xs">width</code>/<code
+			class="font-mono text-xs">height</code
+		>
+		so the page does not shift as it loads), plus
+		<a
+			href="https://tiptap.dev/docs/editor/extensions/functionality/dropcursor"
 			class="underline decoration-muted-foreground/50 underline-offset-2 transition-colors hover:decoration-foreground"
 			target="_blank"
-			rel="noopener noreferrer">DragHandle</a
-		>,
+			rel="noopener noreferrer">Dropcursor</a
+		>
+		and
+		<a
+			href="https://tiptap.dev/docs/editor/extensions/functionality/gapcursor"
+			class="underline decoration-muted-foreground/50 underline-offset-2 transition-colors hover:decoration-foreground"
+			target="_blank"
+			rel="noopener noreferrer">Gapcursor</a
+		>
+		to drop and to click past them,
 		<a
 			href="https://tiptap.dev/docs/editor/extensions/functionality/filehandler"
 			class="underline decoration-muted-foreground/50 underline-offset-2 transition-colors hover:decoration-foreground"
 			target="_blank"
 			rel="noopener noreferrer">FileHandler</a
 		>
-		for dropped images, and
+		to turn a dropped file into a node, and
+		<a
+			href="https://tiptap.dev/docs/editor/extensions/functionality/drag-handle"
+			class="underline decoration-muted-foreground/50 underline-offset-2 transition-colors hover:decoration-foreground"
+			target="_blank"
+			rel="noopener noreferrer">DragHandle</a
+		>
+		with
 		<a
 			href="https://tiptap.dev/docs/editor/extensions/nodes/code-block"
 			class="underline decoration-muted-foreground/50 underline-offset-2 transition-colors hover:decoration-foreground"
 			target="_blank"
 			rel="noopener noreferrer">CodeBlock</a
-		> — all three added in one async callback. Toggle editing, then drag a block by the handle on its
-		left or drop an image file onto the editor.
+		> along for the ride &mdash; all of it in one promise, loaded alongside TipTap. Toggle editing, then
+		drop an image file onto the editor or drag a block by the handle on its left.
 	</p>
 
 	<Demo />
@@ -717,7 +720,7 @@
 
 		<Tabs.Content value="restrict" class="mt-4">
 			<p class="mb-3 text-sm text-muted-foreground">
-				Filter the defaults array to allow only specific formatting. Useful for restricted editing
+				Filter the defaults to allow only specific formatting. Useful for restricted editing
 				contexts.
 			</p>
 			<Code code={EXT_BOLD_ONLY} />

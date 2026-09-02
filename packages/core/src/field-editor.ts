@@ -1,6 +1,5 @@
 import type { Editor } from '@tiptap/core';
 import { importEditor } from './editor/index.js';
-import { resolveExtensions } from './editor/resolve-extensions.js';
 import type { TextEditorOptions, Variant } from './editor/types.js';
 import type { ProseMirrorJSON } from './prosemirror.js';
 
@@ -49,8 +48,7 @@ const NO_SCROLL = { scrollIntoView: false };
  * ```
  */
 export async function loadFieldEditor(opts: FieldEditorOptions): Promise<MountFieldEditor> {
-	const [{ Editor: Tiptap }, extModule] = await importEditor(opts.variant);
-	const extensions = await resolveExtensions(extModule.extensions, opts.options);
+	const [{ Editor: Tiptap }, extensions] = await importEditor(opts.variant, opts.options);
 
 	return function mount(node) {
 		const editor: Editor = new Tiptap({

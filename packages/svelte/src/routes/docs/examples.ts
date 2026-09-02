@@ -153,84 +153,96 @@ export const EXT_PLACEHOLDER = `<Editable.Text
   options={{ placeholder: 'Enter a title…' }}
 />`;
 
-export const EXT_EXTEND_DEFAULTS = `<Editable.Rich
-  bind:value={data.body}
-  options={{
-    extensions: async (defaults) => {
-      const [{ default: CodeBlock }, { default: TaskList }, { default: TaskItem }] =
-        await Promise.all([
-          import('@tiptap/extension-code-block'),
-          import('@tiptap/extension-task-list'),
-          import('@tiptap/extension-task-item')
-        ]);
-      return [...defaults, CodeBlock, TaskList, TaskItem];
+export const EXT_EXTEND_DEFAULTS = `<script lang="ts">
+  import * as Editable from '@editable-kit/svelte';
+  import { defaultExtensions } from '@editable-kit/svelte';
+
+  let editing = $state(false);
+
+  // Whatever you pass IS the extension list. Ask for the variant's defaults
+  // alongside your own imports and everything loads in parallel.
+  const load = () =>
+    Promise.all([
+      defaultExtensions('rich'),
+      import('@tiptap/extension-code-block'),
+      import('@tiptap/extension-highlight')
+    ]).then(([defaults, { CodeBlock }, { Highlight }]) => [...defaults, CodeBlock, Highlight]);
+</script>
+
+<Editable.Rich bind:value={data.body} {editing} options={{ extensions: load }} />`;
+
+export const EXT_REPLACE_ALL = `<script lang="ts">
+  // Leave the defaults out and they are never loaded — you get exactly this list.
+  const load = () =>
+    Promise.all([
+      import('@tiptap/starter-kit'),
+      import('@tiptap/extension-highlight')
+    ]).then(([{ StarterKit }, { Highlight }]) => [
+      StarterKit,
+      Highlight.configure({ multicolor: true })
+    ]);
+</script>
+
+<Editable.Rich bind:value={data.body} options={{ extensions: load() }} />`;
+
+export const EXT_CUSTOM = `<script lang="ts">
+  import { defaultExtensions } from '@editable-kit/svelte';
+  import { Heading } from '@tiptap/extension-heading';
+
+  const CustomHeading = Heading.extend({
+    addAttributes() {
+      return {
+        ...this.parent?.(),
+        id: {
+          default: null,
+          parseHTML: (el) => el.getAttribute('id'),
+          renderHTML: (attrs) => (attrs.id ? { id: attrs.id } : {})
+        }
+      };
     }
-  }}
-/>`;
+  });
 
-export const EXT_REPLACE_ALL = `<Editable.Rich
-  bind:value={data.body}
-  options={{
-    extensions: async () => {
-      const { default: StarterKit } = await import('@tiptap/starter-kit');
-      const { default: Highlight } = await import('@tiptap/extension-highlight');
-      return [StarterKit, Highlight.configure({ multicolor: true })];
-    }
-  }}
-/>`;
+  // Swap it in for the default of the same name:
+  const extensions = defaultExtensions('rich').then((defaults) =>
+    defaults.map((ext) => (ext.name === 'heading' ? CustomHeading : ext))
+);
+</script>
 
-export const EXT_CUSTOM = `import Heading from '@tiptap/extension-heading';
-
-const CustomHeading = Heading.extend({
-  addAttributes() {
-    return {
-      ...this.parent?.(),
-      id: {
-        default: null,
-        parseHTML: (el) => el.getAttribute('id'),
-        renderHTML: (attrs) => (attrs.id ? { id: attrs.id } : {})
-      }
-    };
-  }
-});
-
-// Then use it:
-<Editable.Rich
-  bind:value={data.body}
-  options={{
-    extensions: (defaults) =>
-      defaults.map((ext) => (ext.name === 'heading' ? CustomHeading : ext))
-  }}
-/>`;
+<Editable.Rich bind:value={data.body} options={{ extensions }} />`;
 
 // Extensions page — dynamic import tip
 export const EXT_STATIC_IMPORT = `<script lang="ts">
   // ✗ Static import — pulled into the page's initial bundle
-  import CodeBlock from '@tiptap/extension-code-block';
-  import TaskList from '@tiptap/extension-task-list';
-  import TaskItem from '@tiptap/extension-task-item';
+  import { defaultExtensions } from '@editable-kit/svelte';
+  import { CodeBlock } from '@tiptap/extension-code-block';
+  import { TaskList } from '@tiptap/extension-task-list';
+  import { TaskItem } from '@tiptap/extension-task-item';
+
+  const extensions = defaultExtensions('rich').then((d) => [...d, CodeBlock, TaskList, TaskItem]);
 </script>
 
-<Editable.Rich
-  bind:value={data.body}
-  options={{ extensions: (defaults) => [...defaults, CodeBlock, TaskList, TaskItem] }}
-/>`;
+<Editable.Rich bind:value={data.body} {editing} options={{ extensions }} />`;
 
-export const EXT_DYNAMIC_IMPORT = `<Editable.Rich
-  bind:value={data.body}
-  options={{
-    extensions: async (defaults) => {
-      // ✓ Dynamic import — loaded only when the editor mounts
-      const [{ default: CodeBlock }, { default: TaskList }, { default: TaskItem }] =
-        await Promise.all([
-          import('@tiptap/extension-code-block'),
-          import('@tiptap/extension-task-list'),
-          import('@tiptap/extension-task-item')
-        ]);
-      return [...defaults, CodeBlock, TaskList, TaskItem];
-    }
-  }}
-/>`;
+export const EXT_DYNAMIC_IMPORT = `<script lang="ts">
+  import { defaultExtensions } from '@editable-kit/svelte';
+
+  // ✓ Dynamic import — its own chunk, requested on the first edit and
+  //   downloaded alongside TipTap and the defaults rather than after them
+  const load = () =>
+    Promise.all([
+      defaultExtensions('rich'),
+      import('@tiptap/extension-code-block'),
+      import('@tiptap/extension-task-list'),
+      import('@tiptap/extension-task-item')
+    ]).then(([d, { CodeBlock }, { TaskList }, { TaskItem }]) => [
+      ...d,
+      CodeBlock,
+      TaskList,
+      TaskItem
+    ]);
+</script>
+
+<Editable.Rich bind:value={data.body} {editing} options={{ extensions: load }} />`;
 
 // Renderer page
 export const RENDERER_BASIC = `<script lang="ts">
@@ -744,30 +756,29 @@ export const LOW_LEVEL_STANDALONE_FORM = `\
 </form>`;
 
 // Extension expansion examples
-export const EXT_CODE_BLOCK = `\
-<Editable.Rich
-  bind:value={data.body}
-  options={{
-    extensions: async (defaults) => {
-      const { CodeBlock } = await import('@tiptap/extension-code-block');
-      return [...defaults, CodeBlock];
-    }
-  }}
-/>`;
+export const EXT_CODE_BLOCK = `<script lang="ts">
+  const load = () =>
+    Promise.all([
+      defaultExtensions('rich'),
+      import('@tiptap/extension-code-block')
+    ]).then(([d, { CodeBlock }]) => [...d, CodeBlock]);
+</script>
 
-export const EXT_HIGHLIGHT = `\
-<Editable.Rich
-  bind:value={data.body}
-  options={{
-    extensions: async (defaults) => {
-      const { Highlight } = await import('@tiptap/extension-highlight');
-      return [...defaults, Highlight.configure({ multicolor: true })];
-    }
-  }}
-/>`;
+<Editable.Rich bind:value={data.body} {editing} options={{ extensions: load }} />`;
+
+export const EXT_HIGHLIGHT = `<script lang="ts">
+  const load = () =>
+    Promise.all([
+      defaultExtensions('rich'),
+      import('@tiptap/extension-highlight')
+    ]).then(([d, { Highlight }]) => [...d, Highlight.configure({ multicolor: true })]);
+</script>
+
+<Editable.Rich bind:value={data.body} {editing} options={{ extensions: load }} />`;
 
 export const EXT_COMPOSED_DEMO = `<script lang="ts">
   import * as Editable from '@editable-kit/svelte';
+  import { defaultExtensions } from '@editable-kit/svelte';
   import type { Extensions, Editor } from '@tiptap/core';
   import type { JSONContent } from '@editable-kit/core/types';
   import { highlight } from '$lib/highlight.js';
@@ -775,9 +786,22 @@ export const EXT_COMPOSED_DEMO = `<script lang="ts">
   let editing = $state(false);
   let doc = $state(post.body);
 
-  // One async callback, three extensions — all code-split with the editor.
-  async function extensions(defaults: Extensions): Promise<Extensions> {
-    const [{ CodeBlockShiki }, { DragHandle }, { FileHandler }] = await Promise.all([
+  // One promise, every extension code-split with the editor and loaded in parallel
+  // with it — the rich defaults included, since this list replaces them outright.
+  async function load(): Promise<Extensions> {
+    const [
+      defaults,
+      { EkImage },
+      { Dropcursor },
+      { Gapcursor },
+      { CodeBlockShiki },
+      { DragHandle },
+      { FileHandler }
+    ] = await Promise.all([
+      defaultExtensions('rich'),
+      import('@editable-kit/svelte'),
+      import('@tiptap/extension-dropcursor'),
+      import('@tiptap/extension-gapcursor'),
       import('tiptap-extension-code-block-shiki'),
       import('@tiptap/extension-drag-handle'),
       import('@tiptap/extension-file-handler')
@@ -785,6 +809,11 @@ export const EXT_COMPOSED_DEMO = `<script lang="ts">
 
     return [
       ...defaults,
+      // The rich defaults are text only. EkImage holds the node (and keeps its
+      // width/height); the two cursors let you drop into and click past it.
+      EkImage,
+      Dropcursor,
+      Gapcursor,
       // Same theme as the view-mode override below, so nothing shifts on click.
       CodeBlockShiki.configure({ defaultTheme: 'github-light', defaultLanguage: 'typescript' }),
       DragHandle.configure({
@@ -815,7 +844,7 @@ export const EXT_COMPOSED_DEMO = `<script lang="ts">
 <!-- View mode never mounts TipTap, so the editor's Shiki extension cannot reach it.
      This snippet is the view-mode half — same highlighter, same theme. -->
 {#snippet codeBlock(node: JSONContent)}
-  {@const code = node.content?.map((c) => c.text ?? '').join('') ?? ''}
+  {@const code = Editable.textContent(node)}
   {#await highlight(code, node.attrs?.language ?? 'typescript')}
     <pre><code>{code}</code></pre>
   {:then html}
@@ -828,7 +857,7 @@ export const EXT_COMPOSED_DEMO = `<script lang="ts">
 <Editable.Rich
   bind:value={doc}
   {editing}
-  options={{ extensions }}
+  options={{ extensions: load }}
   overrides={{ nodes: { codeBlock } }}
 />`;
 
@@ -867,17 +896,16 @@ export const EXT_AUGMENT_USE = `<script lang="ts">
   <Editable.Rich bind:value={data.body} options={{ extensions: withCallout }} />
 </Editable.Root>`;
 
-export const EXT_BOLD_ONLY = `\
-<!-- Restrict to bold only — no other formatting -->
-<Editable.Rich
-  bind:value={data.body}
-  options={{
-    extensions: (defaults) =>
-      defaults.filter((ext) =>
-        ['document', 'paragraph', 'text', 'history', 'bold'].includes(ext.name)
-      )
-  }}
-/>`;
+export const EXT_BOLD_ONLY = `<!-- Restrict to bold only — no other formatting -->
+<script lang="ts">
+  const extensions = defaultExtensions('rich').then((defaults) =>
+    defaults.filter((ext) =>
+      ['doc', 'paragraph', 'text', 'history', 'bold'].includes(ext.name)
+    )
+  );
+</script>
+
+<Editable.Rich bind:value={data.body} options={{ extensions }} />`;
 
 export const API_DOC_HELPERS = `import { text, paragraphs } from '@editable-kit/svelte';
 

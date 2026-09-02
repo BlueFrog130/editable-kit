@@ -29,6 +29,13 @@ export {
 	paragraphs,
 	image,
 	imageAttrs,
+	textContent,
+	doc,
+	heading,
+	codeBlock,
+	list,
+	EkImage,
+	defaultExtensions,
 	pickFile,
 	nodeDefaults,
 	markDefaults

@@ -59,8 +59,6 @@
 		"@tiptap/extension-bold": "catalog:",
 		"@tiptap/extension-bullet-list": "catalog:",
 		"@tiptap/extension-document": "catalog:",
-		"@tiptap/extension-dropcursor": "catalog:",
-		"@tiptap/extension-gapcursor": "catalog:",
 		"@tiptap/extension-hard-break": "catalog:",
 		"@tiptap/extension-heading": "catalog:",
 		"@tiptap/extension-history": "catalog:",

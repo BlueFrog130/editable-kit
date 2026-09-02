@@ -1,11 +1,20 @@
 export type { _TiptapCommands } from './tiptap-commands.js';
 
 // ── Default-content helpers ──
-export { text, paragraphs, image, imageAttrs } from './doc.js';
+export {
+	text,
+	paragraphs,
+	image,
+	imageAttrs,
+	textContent,
+	doc,
+	heading,
+	codeBlock,
+	list
+} from './doc.js';
 
 // ── Editor ──
-export { importEditor } from './editor/index.js';
-export { resolveExtensions } from './editor/resolve-extensions.js';
+export { importEditor, defaultExtensions } from './editor/index.js';
 export { EkImage } from './editor/image-extension.js';
 export type { TextEditorOptions, UploadHandler, Variant } from './editor/types.js';
 

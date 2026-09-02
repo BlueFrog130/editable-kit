@@ -2,8 +2,12 @@ import type { Extensions, Editor } from '@tiptap/core';
 import type { EditorProps } from '@tiptap/pm/view';
 
 export type TextEditorOptions = {
-	/** Customize extensions. Receives defaults, returns final array. Async for lazy imports. */
-	extensions?: (defaults: Extensions) => Extensions | Promise<Extensions>;
+	/**
+	 * Replaces the variant defaults outright. Pass a promise (`import('...').then(...)`)
+	 * and it loads in parallel with TipTap. To build on the defaults instead of dropping
+	 * them, `Promise.all([defaultExtensions('rich'), import('...')])`.
+	 */
+	extensions?: Extensions | Promise<Extensions>;
 	/** Override placeholder text */
 	placeholder?: string;
 	/** Called after Editor is created — full TipTap/ProseMirror access */

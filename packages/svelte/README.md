@@ -245,7 +245,12 @@ Render ProseMirror JSON as HTML without loading the editor — perfect for read-
 
 ### Custom extensions
 
-Add a TipTap extension through `options.extensions` and its nodes end up in the document. They still
+`options.extensions` is the editor's whole extension list — pass an array or a promise of one and it
+replaces the variant defaults; `defaultExtensions(variant)` returns those defaults, so
+`Promise.all([defaultExtensions('rich'), import('…')])` builds on them with everything still loading
+in parallel.
+
+Add a TipTap extension that way and its nodes end up in the document. They still
 render — an unknown node renders its children, and you can give it a snippet through `overrides` —
 but that snippet receives TipTap's loose `JSONContent`. Register the type to get your own instead:
 

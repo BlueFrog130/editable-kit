@@ -8,16 +8,15 @@ import Heading from '@tiptap/extension-heading';
 import BulletList from '@tiptap/extension-bullet-list';
 import OrderedList from '@tiptap/extension-ordered-list';
 import ListItem from '@tiptap/extension-list-item';
-import { EkImage } from './image-extension.js';
-import Dropcursor from '@tiptap/extension-dropcursor';
 import Strike from '@tiptap/extension-strike';
 import History from '@tiptap/extension-history';
 import Blockquote from '@tiptap/extension-blockquote';
 import HardBreak from '@tiptap/extension-hard-break';
-import Gapcursor from '@tiptap/extension-gapcursor';
 import Underline from '@tiptap/extension-underline';
 import Placeholder from '@tiptap/extension-placeholder';
 
+// ponytail: text only. Images (and the Dropcursor/Gapcursor that make them
+// navigable) are a consumer's `extensions` callback away — see the docs.
 export const extensions = [
 	Document,
 	Paragraph,
@@ -35,12 +34,9 @@ export const extensions = [
 	BulletList,
 	OrderedList,
 	ListItem,
-	EkImage,
-	Dropcursor,
 	Strike,
 	History,
 	Blockquote,
 	HardBreak,
-	Gapcursor,
 	Placeholder.configure({ placeholder: 'Type something\u2026' })
 ];

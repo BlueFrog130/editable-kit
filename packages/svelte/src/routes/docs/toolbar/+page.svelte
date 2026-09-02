@@ -141,7 +141,7 @@
 				Returns <code class="font-mono">{`{ isActive, has, run }`}</code> — a reactive object for a toolbar
 				button.
 			</p>
-			<Code code={TOOLBAR_COMMAND_API} />
+			<Code code={TOOLBAR_COMMAND_API} lang="ts" />
 		</div>
 		<div class="rounded-lg border border-border p-4">
 			<p class="font-mono text-sm">state.isActive(name, attributes?)</p>
