@@ -1,6 +1,6 @@
 {
 	"name": "@editable-kit/svelte",
-	"version": "1.0.1",
+	"version": "1.1.0",
 	"description": "Svelte 5 inline editing — editable text, rich text (TipTap), and images, bound straight at your data",
 	"keywords": [
 		"svelte",

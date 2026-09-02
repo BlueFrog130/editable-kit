@@ -1,5 +1,41 @@
 # editable-kit
 
+## 1.1.0
+
+### Minor Changes
+
+- [`e1ce458`](https://github.com/BlueFrog130/editable-kit/commit/e1ce45888d7d57fa609595db7babb3808b079402) Thanks [@BlueFrog130](https://github.com/BlueFrog130)! - Add `doc()`, `heading()`, `codeBlock()`, `list()` and `textContent()` to the document
+  helpers. `textContent()` reads a document’s plain text the way ProseMirror’s own
+  `textBetween()` does, without mounting an editor. `doc()`
+  flattens the documents `text()`/`paragraphs()`/`image()` return, so multi-block defaults
+  compose instead of being hand-written as ProseMirror JSON.
+
+- [`e1ce458`](https://github.com/BlueFrog130/editable-kit/commit/e1ce45888d7d57fa609595db7babb3808b079402) Thanks [@BlueFrog130](https://github.com/BlueFrog130)! - `options.extensions` now takes an array or a promise of one, and it **replaces** the variant defaults instead of being merged over them by name. The `(defaults) => …` callback form is gone, and with it the round trip it cost — a promise you pass starts loading in parallel with TipTap.
+
+  Building on the defaults is now explicit: the new `defaultExtensions(variant)` export returns the (cached, lazily loaded) default list, so `Promise.all([defaultExtensions('rich'), import('…')])` keeps everything in flight at once.
+
+  ```diff
+  - options={{ extensions: [Highlight] }}
+  + options={{
+  +   extensions: Promise.all([
+  +     defaultExtensions('rich'),
+  +     import('@tiptap/extension-highlight')
+  +   ]).then(([defaults, { Highlight }]) => [...defaults, Highlight])
+  + }}
+  ```
+
+  `resolveExtensions` is no longer exported.
+
+- [`e1ce458`](https://github.com/BlueFrog130/editable-kit/commit/e1ce45888d7d57fa609595db7babb3808b079402) Thanks [@BlueFrog130](https://github.com/BlueFrog130)! - The `rich` variant is text only: `EkImage`, `Dropcursor` and `Gapcursor` are no longer in its
+  default extension set. Add them yourself in an `extensions` callback if you want images — see the
+  "Adding Image Support" example in the extensions docs. `EkImage` is now also re-exported from
+  `@editable-kit/svelte`.
+
+### Patch Changes
+
+- Updated dependencies [[`e1ce458`](https://github.com/BlueFrog130/editable-kit/commit/e1ce45888d7d57fa609595db7babb3808b079402), [`e1ce458`](https://github.com/BlueFrog130/editable-kit/commit/e1ce45888d7d57fa609595db7babb3808b079402), [`e1ce458`](https://github.com/BlueFrog130/editable-kit/commit/e1ce45888d7d57fa609595db7babb3808b079402)]:
+  - @editable-kit/core@1.1.0
+
 ## 1.0.1
 
 ### Patch Changes
