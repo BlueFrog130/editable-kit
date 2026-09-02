@@ -31,7 +31,7 @@
 					View Documentation &rarr;
 				</a>
 				<a
-					href={resolve('/docs/getting-started')}
+					href={resolve('/docs/svelte/getting-started')}
 					class="inline-flex h-11 items-center justify-center rounded-md border border-border bg-background px-8 text-sm font-medium shadow-xs transition-colors hover:bg-accent hover:text-accent-foreground"
 				>
 					Get Started

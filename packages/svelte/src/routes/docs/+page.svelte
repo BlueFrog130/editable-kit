@@ -6,6 +6,7 @@
 	import Code from './code.svelte';
 	import Example from './example.svelte';
 	import { CORE_CONCEPTS } from './examples.js';
+	import { resolve } from '$app/paths';
 	import { Separator } from '../components/ui/separator/index.js';
 	import DocToolbar from './doc-toolbar.svelte';
 
@@ -23,7 +24,7 @@
 	<p class="mb-4 text-xs font-medium tracking-[0.25em] text-muted-foreground uppercase">Overview</p>
 	<h1 class="font-serif text-4xl leading-tight tracking-tight sm:text-5xl">editable-kit</h1>
 	<p class="mt-4 max-w-xl text-lg leading-relaxed text-muted-foreground">
-		Inline editing for Svelte 5. Plain text, rich text via <a
+		Inline editing for the web. Plain text, rich text via <a
 			href="https://tiptap.dev/docs/editor"
 			class="underline decoration-muted-foreground/50 underline-offset-2 transition-colors hover:decoration-foreground"
 			target="_blank"
@@ -90,6 +91,25 @@
 			</p>
 		</div>
 	</div>
+</section>
+
+<!-- Packages -->
+<section class="mb-16">
+	<h2 class="font-serif text-2xl tracking-tight">Two halves</h2>
+	<p class="mt-3 max-w-2xl leading-relaxed text-muted-foreground">
+		<code class="rounded bg-muted px-1.5 py-0.5 font-mono text-sm">@editable-kit/core</code> holds everything
+		that is not a UI framework &mdash; the document types and helpers, the TipTap extension sets, and
+		the editor lifecycle. A framework package wraps it in that framework's own reactivity and components,
+		and re-exports core's whole surface, so you install one package, not two.
+	</p>
+	<p class="mt-3 max-w-2xl leading-relaxed text-muted-foreground">
+		The sidebar is split the same way: <a
+			href={resolve('/docs/core')}
+			class="underline decoration-muted-foreground/50 underline-offset-2 transition-colors hover:decoration-foreground"
+			>Core</a
+		> applies whatever you are building with, and everything under the framework selector is specific
+		to the one you picked. The live examples on this page are Svelte.
+	</p>
 </section>
 
 <Editable.Root bind:data {editing}>

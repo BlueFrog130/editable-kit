@@ -6,40 +6,46 @@ const BUILD_DIR = 'build';
 const BASE_URL = 'https://bluefrog130.github.io/editable-kit';
 
 /**
- * Navigation structure — mirrors src/routes/docs/+layout.svelte
+ * Navigation structure — mirrors src/routes/docs/frameworks.ts. `slug` is the path
+ * under /docs; a page's built file is that slug plus `.html`.
  */
 const nav = [
 	{
 		category: 'Overview',
+		items: [{ label: 'Introduction', slug: '' }]
+	},
+	{
+		category: 'Core (framework-agnostic)',
 		items: [
-			{ label: 'Introduction', slug: '', file: 'docs.html' },
-			{ label: 'Getting Started', slug: 'getting-started', file: 'docs/getting-started.html' }
+			{ label: 'Overview', slug: 'core' },
+			{ label: 'Documents', slug: 'core/documents' },
+			{ label: 'Field Editor', slug: 'core/field-editor' },
+			{ label: 'Extensions', slug: 'core/extensions' }
 		]
 	},
 	{
-		category: 'Guide',
+		category: 'Svelte',
 		items: [
-			{ label: 'Editors', slug: 'editors', file: 'docs/editors.html' },
-			{ label: 'Extensions', slug: 'extensions', file: 'docs/extensions.html' },
-			{ label: 'Saving', slug: 'saving', file: 'docs/saving.html' },
-			{ label: 'Arrays & Lists', slug: 'arrays', file: 'docs/arrays.html' },
-			{ label: 'Low-Level Editors', slug: 'low-level', file: 'docs/low-level.html' },
-			{ label: 'Theming', slug: 'theming', file: 'docs/theming.html' },
-			{ label: 'Patterns', slug: 'patterns', file: 'docs/patterns.html' }
+			{ label: 'Getting Started', slug: 'svelte/getting-started' },
+			{ label: 'Editors', slug: 'svelte/editors' },
+			{ label: 'Toolbar', slug: 'svelte/toolbar' },
+			{ label: 'Extensions', slug: 'svelte/extensions' },
+			{ label: 'Saving', slug: 'svelte/saving' },
+			{ label: 'Arrays & Lists', slug: 'svelte/arrays' },
+			{ label: 'Standalone Fields', slug: 'svelte/low-level' },
+			{ label: 'Theming', slug: 'svelte/theming' },
+			{ label: 'Patterns', slug: 'svelte/patterns' },
+			{ label: 'Renderer', slug: 'svelte/renderer' },
+			{ label: 'API Reference', slug: 'svelte/api' }
 		]
-	},
-	{
-		category: 'Components',
-		items: [
-			{ label: 'Toolbar', slug: 'toolbar', file: 'docs/toolbar.html' },
-			{ label: 'Renderer', slug: 'renderer', file: 'docs/renderer.html' }
-		]
-	},
-	{
-		category: 'Reference',
-		items: [{ label: 'API Reference', slug: 'api', file: 'docs/api.html' }]
 	}
-];
+].map((group) => ({
+	...group,
+	items: group.items.map((item) => ({
+		...item,
+		file: item.slug ? `docs/${item.slug}.html` : 'docs.html'
+	}))
+}));
 
 /**
  * Extract the <main> content from a full HTML page
@@ -165,7 +171,7 @@ function generateLlmsTxt() {
 	const lines = [
 		'# editable-kit',
 		'',
-		'> Inline editing for Svelte 5. Plain text, rich text via TipTap, and images with cropping — without compromising performance, safety, or prerendering.',
+		'> Inline editing for the web. Plain text, rich text via TipTap, and images — without compromising performance, safety, or prerendering. `@editable-kit/core` is framework-agnostic; `@editable-kit/svelte` is the Svelte 5 adapter.',
 		'',
 		`- [Full documentation](${BASE_URL}/llms-full.txt): The complete editable-kit documentation including all examples`,
 		''
@@ -191,7 +197,7 @@ function generateLlmsTxt() {
 		'## Notes',
 		'',
 		'- This content is automatically generated from the documentation pages',
-		'- editable-kit requires Svelte 5 (runes-based reactivity)',
+		'- The Svelte adapter requires Svelte 5 (runes-based reactivity); core needs no framework',
 		'- Rich text editing is powered by TipTap (ProseMirror)',
 		''
 	);
@@ -206,7 +212,7 @@ function generateLlmsFullTxt() {
 	const lines = [
 		'# editable-kit — Full Documentation',
 		'',
-		'> Inline editing for Svelte 5. Plain text, rich text via TipTap, and images with cropping — without compromising performance, safety, or prerendering.',
+		'> Inline editing for the web. Plain text, rich text via TipTap, and images — without compromising performance, safety, or prerendering. `@editable-kit/core` is framework-agnostic; `@editable-kit/svelte` is the Svelte 5 adapter.',
 		''
 	];
 

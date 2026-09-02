@@ -1,53 +1,100 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
+	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import * as Sheet from '../components/ui/sheet/index.js';
+	import * as Select from '../components/ui/select/index.js';
 	import { Button } from '../components/ui/button/index.js';
 	import MenuIcon from '@lucide/svelte/icons/menu';
+	import { CORE_NAV, FRAMEWORKS, frameworkFromPath, type NavGroup } from './frameworks.js';
+	import { FRAMEWORK_ICONS } from './framework-icons.js';
 
 	let { children }: { children: Snippet } = $props();
 
 	let mobileNavOpen = $state(false);
 
-	const nav = [
-		{
-			category: 'Overview',
-			items: [
-				{ label: 'Introduction', href: resolve('/docs') },
-				{ label: 'Getting Started', href: resolve('/docs/getting-started') }
-			]
-		},
-		{
-			category: 'Guide',
-			items: [
-				{ label: 'Editors', href: resolve('/docs/editors') },
-				{ label: 'Extensions', href: resolve('/docs/extensions') },
-				{ label: 'Saving', href: resolve('/docs/saving') },
-				{ label: 'Arrays & Lists', href: resolve('/docs/arrays') },
-				{ label: 'Standalone Fields', href: resolve('/docs/low-level') },
-				{ label: 'Theming', href: resolve('/docs/theming') },
-				{ label: 'Patterns', href: resolve('/docs/patterns') }
-			]
-		},
-		{
-			category: 'Components',
-			items: [
-				{ label: 'Toolbar', href: resolve('/docs/toolbar') },
-				{ label: 'Renderer', href: resolve('/docs/renderer') }
-			]
-		},
-		{
-			category: 'Reference',
-			items: [{ label: 'API Reference', href: resolve('/docs/api') }]
-		}
-	];
+	const framework = $derived(frameworkFromPath(page.url.pathname));
+	const frameworkNav = $derived(
+		(FRAMEWORKS.find((f) => f.id === framework)?.nav ?? []) as NavGroup[]
+	);
+
+	function selectFramework(id: string) {
+		const next = FRAMEWORKS.find((f) => f.id === id);
+		const first = next?.nav[0]?.items[0];
+		if (first) goto(first.href);
+	}
 
 	function isActive(href: string) {
 		if (href === resolve('/docs')) return page.url.pathname === resolve('/docs');
 		return page.url.pathname.startsWith(href);
 	}
 </script>
+
+{#snippet navLink(label: string, href: string)}
+	<a
+		{href}
+		onclick={() => (mobileNavOpen = false)}
+		class="block rounded-md px-3 py-1.5 text-sm transition-colors {isActive(href)
+			? 'bg-muted font-medium text-foreground'
+			: 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'}"
+	>
+		{label}
+	</a>
+{/snippet}
+
+{#snippet navGroups(groups: NavGroup[])}
+	{#each groups as group (group.category)}
+		<div>
+			<p class="mb-2 text-[10px] font-medium tracking-[0.2em] text-muted-foreground uppercase">
+				{group.category}
+			</p>
+			<ul class="space-y-1">
+				{#each group.items as item (item.href)}
+					<li>{@render navLink(item.label, item.href)}</li>
+				{/each}
+			</ul>
+		</div>
+	{/each}
+{/snippet}
+
+{#snippet frameworkIcon(id: string)}
+	<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+		<path d={FRAMEWORK_ICONS[id]} />
+	</svg>
+{/snippet}
+
+{#snippet sidebar()}
+	<div class="space-y-6">
+		<Select.Root type="single" value={framework} onValueChange={selectFramework}>
+			<Select.Trigger class="w-full" aria-label="Select framework">
+				<!-- one child, so justify-between keeps the label beside its icon, not centred -->
+				<span class="flex items-center gap-2">
+					{@render frameworkIcon(framework)}
+					{FRAMEWORKS.find((f) => f.id === framework)?.label}
+				</span>
+			</Select.Trigger>
+			<Select.Content>
+				{#each FRAMEWORKS as f (f.id)}
+					<Select.Item value={f.id} label={f.label} disabled={f.nav.length === 0}>
+						{@render frameworkIcon(f.id)}
+						{f.label}
+						{#if f.nav.length === 0}
+							<span class="text-xs text-muted-foreground">coming soon</span>
+						{/if}
+					</Select.Item>
+				{/each}
+			</Select.Content>
+		</Select.Root>
+
+		<ul class="space-y-1">
+			<li>{@render navLink('Introduction', resolve('/docs'))}</li>
+		</ul>
+
+		{@render navGroups(CORE_NAV)}
+		{@render navGroups(frameworkNav)}
+	</div>
+{/snippet}
 
 <div class="flex min-h-screen flex-col">
 	<nav
@@ -80,33 +127,7 @@
 		<aside
 			class="sticky top-14 hidden h-[calc(100vh-3.5rem)] w-56 shrink-0 overflow-y-auto border-r border-border pt-10 pr-6 pb-10 md:block"
 		>
-			<div class="space-y-6">
-				{#each nav as group (group.category)}
-					<div>
-						<p
-							class="mb-2 text-[10px] font-medium tracking-[0.2em] text-muted-foreground uppercase"
-						>
-							{group.category}
-						</p>
-						<ul class="space-y-1">
-							{#each group.items as item (item.href)}
-								<li>
-									<a
-										href={item.href}
-										class="block rounded-md px-3 py-1.5 text-sm transition-colors {isActive(
-											item.href
-										)
-											? 'bg-muted font-medium text-foreground'
-											: 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'}"
-									>
-										{item.label}
-									</a>
-								</li>
-							{/each}
-						</ul>
-					</div>
-				{/each}
-			</div>
+			{@render sidebar()}
 		</aside>
 
 		<!-- Mobile nav sheet -->
@@ -115,33 +136,8 @@
 				<Sheet.Header class="border-b border-border px-6 py-4">
 					<Sheet.Title class="text-xs tracking-[0.15em] uppercase">Navigation</Sheet.Title>
 				</Sheet.Header>
-				<nav class="space-y-6 overflow-y-auto px-4 py-6">
-					{#each nav as group (group.category)}
-						<div>
-							<p
-								class="mb-2 text-[10px] font-medium tracking-[0.2em] text-muted-foreground uppercase"
-							>
-								{group.category}
-							</p>
-							<ul class="space-y-1">
-								{#each group.items as item (item.href)}
-									<li>
-										<a
-											href={item.href}
-											onclick={() => (mobileNavOpen = false)}
-											class="block rounded-md px-3 py-1.5 text-sm transition-colors {isActive(
-												item.href
-											)
-												? 'bg-muted font-medium text-foreground'
-												: 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'}"
-										>
-											{item.label}
-										</a>
-									</li>
-								{/each}
-							</ul>
-						</div>
-					{/each}
+				<nav class="overflow-y-auto px-4 py-6">
+					{@render sidebar()}
 				</nav>
 			</Sheet.Content>
 		</Sheet.Root>
