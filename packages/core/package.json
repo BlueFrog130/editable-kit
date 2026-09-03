@@ -1,6 +1,6 @@
 {
 	"name": "@editable-kit/core",
-	"version": "1.1.0",
+	"version": "1.1.1",
 	"description": "Framework-agnostic core for editable-kit — ProseMirror document types, TipTap extension sets, and the field editor lifecycle",
 	"keywords": [
 		"inline-editing",
