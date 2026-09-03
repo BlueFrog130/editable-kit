@@ -271,6 +271,9 @@ importers:
         specifier: 'catalog:'
         version: 3.30.5
     devDependencies:
+      '@types/node':
+        specifier: ^26.2.0
+        version: 26.2.0
       jsdom:
         specifier: ^30.0.1
         version: 30.0.1
