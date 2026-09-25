@@ -1,102 +1,109 @@
-# editable-kit (monorepo)
+<p align="center">
+  <h1 align="center">editable-kit</h1>
+  <p align="center">
+    Inline editing for your real pages — text, rich text, and images. No admin panel, no iframe, no layout shift.
+  </p>
+</p>
 
-Inline editing — plain text, rich text (TipTap), and images. The editor mounts onto the element
-that already rendered your content, so edit mode adds no box.
+<p align="center">
+  <a href="https://www.npmjs.com/package/@editable-kit/svelte"><img src="https://img.shields.io/npm/v/%40editable-kit%2Fsvelte?color=%23f43f5e&label=npm" alt="npm version"></a>
+  <a href="https://www.npmjs.com/package/@editable-kit/svelte"><img src="https://img.shields.io/npm/dm/%40editable-kit%2Fsvelte?color=%2310b981" alt="monthly downloads"></a>
+  <a href="https://www.npmjs.com/package/@editable-kit/svelte"><img src="https://img.shields.io/npm/dt/%40editable-kit%2Fsvelte?color=%2310b981&label=total%20downloads" alt="total downloads"></a>
+  <a href="https://bundlephobia.com/package/@editable-kit/svelte"><img src="https://img.shields.io/bundlephobia/minzip/%40editable-kit%2Fsvelte?label=min%2Bgzip" alt="bundle size"></a>
+  <a href="https://github.com/BlueFrog130/editable-kit/actions/workflows/ci.yml"><img src="https://github.com/BlueFrog130/editable-kit/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="https://github.com/BlueFrog130/editable-kit/blob/main/LICENSE"><img src="https://img.shields.io/npm/l/%40editable-kit%2Fsvelte?color=%234f46e5" alt="license"></a>
+  <a href="https://github.com/BlueFrog130/editable-kit/stargazers"><img src="https://img.shields.io/github/stars/BlueFrog130/editable-kit?style=flat&color=%23eab308" alt="GitHub stars"></a>
+  <img src="https://img.shields.io/badge/svelte-5-ff3e00" alt="Svelte 5">
+  <img src="https://img.shields.io/badge/types-TypeScript-3178c6" alt="TypeScript">
+</p>
+
+<p align="center">
+  <a href="https://bluefrog130.github.io/editable-kit/"><strong>Live Demo</strong></a> ·
+  <a href="https://bluefrog130.github.io/editable-kit/docs"><strong>Documentation</strong></a> ·
+  <a href="https://www.npmjs.com/package/@editable-kit/svelte">npm</a>
+</p>
+
+---
+
+Turn any page into an editable, CMS-like experience. Point a field at the property it edits —
+`<Editable.Text bind:value={post.title} />` — and your users edit text, rich content, and images
+right where they read them.
+
+**It is not a CMS.** No content lake, no hosted backend, no GraphQL layer — you own the data and
+the storage. And unlike visual editors that overlay your site in an iframe, the editor mounts onto
+the very element that rendered your content, so the editable view and the published view are the
+same DOM.
+
+## Features
+
+- **No layout shift** — TipTap mounts onto the already-rendered element; edit mode adds no box
+- **Rich text** — full WYSIWYG powered by [TipTap](https://tiptap.dev/): headings, lists, links, marks
+- **Plain text & images** — single-line, multiline, and image fields
+- **Type-safe** — `bind:value` _is_ the type check; no string selectors to get wrong
+- **Zero editor code in view mode** — TipTap loads only when a field is first focused
+- **Bring your own toolbar** — reactive commands, your design
+- **Bring your own backend** — `onsave` hands you a plain JSON snapshot; store it anywhere
+- **Framework-agnostic core** — Svelte 5 today, more adapters to come
+
+## Install
+
+```bash
+pnpm add @editable-kit/svelte
+```
+
+## Quick start
+
+```svelte
+<script lang="ts">
+	import * as Editable from '@editable-kit/svelte';
+
+	import type { ProseMirrorJSON } from '@editable-kit/svelte';
+
+	type Page = { title: ProseMirrorJSON; body: ProseMirrorJSON; image: ProseMirrorJSON };
+
+	let data: Page = $state({} as Page); // your data here
+	let editing = $state(false);
+
+	async function save(saved: Page) {
+		await fetch('/api/page', { method: 'PUT', body: JSON.stringify(saved) });
+		editing = false;
+	}
+</script>
+
+<button onclick={() => (editing = !editing)}>{editing ? 'Cancel' : 'Edit'}</button>
+
+<Editable.Root bind:data {editing} onsave={save}>
+	{#snippet children({ save, dirty })}
+		<h1><Editable.Text bind:value={data.title} /></h1>
+		<Editable.Rich bind:value={data.body} />
+		<Editable.Image bind:value={data.image} />
+
+		{#if editing}<button onclick={save} disabled={!dirty}>Save</button>{/if}
+	{/snippet}
+</Editable.Root>
+```
+
+**[Read the docs →](https://bluefrog130.github.io/editable-kit/docs)**
 
 ## Packages
 
-| Path                    | Package                | Description                                                                                             |
-| ----------------------- | ---------------------- | ------------------------------------------------------------------------------------------------------- |
-| `packages/core`         | `@editable-kit/core`   | Framework-agnostic: document types, TipTap extension sets, the field editor lifecycle. No UI framework. |
-| `packages/svelte`       | `@editable-kit/svelte` | The Svelte 5 components + the docs/demo site (GitHub Pages). Re-exports all of core.                    |
-| `packages/editable-kit` | `editable-kit`         | Deprecated. Re-exports `@editable-kit/svelte` so existing installs keep working.                        |
-| `examples/basic-auth`   | `basic-auth`           | Example app — session auth, local disk storage.                                                         |
-| `examples/cloudflare`   | `cloudflare-example`   | Example app — Workers, content and images in R2.                                                        |
+| Package                                                                      | Version                                                                                                                                    | Downloads                                                                                                                         |
+| ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------- |
+| [`@editable-kit/svelte`](https://www.npmjs.com/package/@editable-kit/svelte) | [![npm](https://img.shields.io/npm/v/%40editable-kit%2Fsvelte?color=%23f43f5e&label=)](https://www.npmjs.com/package/@editable-kit/svelte) | [![downloads](https://img.shields.io/npm/dm/%40editable-kit%2Fsvelte?label=)](https://www.npmjs.com/package/@editable-kit/svelte) |
+| [`@editable-kit/core`](https://www.npmjs.com/package/@editable-kit/core)     | [![npm](https://img.shields.io/npm/v/%40editable-kit%2Fcore?color=%23f43f5e&label=)](https://www.npmjs.com/package/@editable-kit/core)     | [![downloads](https://img.shields.io/npm/dm/%40editable-kit%2Fcore?label=)](https://www.npmjs.com/package/@editable-kit/core)     |
 
-Everything framework-agnostic lives in `core`; only `svelte` depends on a UI framework. The graph
-is a line:
+Svelte apps only need `@editable-kit/svelte` — it re-exports all of core.
 
-```
-@editable-kit/core ──> @editable-kit/svelte
-```
+## Examples
 
-If you are building a Svelte app, install `@editable-kit/svelte` — it pulls core in and re-exports
-it, so you never import core directly. The one exception is registering your own node and mark
-types, which has to name the module that declares them:
+- [`examples/basic-auth`](examples/basic-auth) — session auth, local disk storage
+- [`examples/cloudflare`](examples/cloudflare) — Workers, content and images in R2
 
-```ts
-declare module '@editable-kit/core/types' {
-	interface NodeTypes {
-		callout: { type: 'callout'; attrs: { tone: 'info' | 'warn' }; content?: PMNode[] };
-	}
-}
-```
+## Contributing
 
-## Releasing
+Issues and PRs welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for the monorepo layout, commands,
+and release process.
 
-Changesets, unchanged by the split. `core` and `svelte` are `linked` in `.changeset/config.json`, so
-they always carry the same version.
+## License
 
-```bash
-pnpm changeset      # describe the change, pick the packages
-git commit && push  # merge to main
-```
-
-The Release workflow opens a "Version Packages" PR. Merging it runs `pnpm release`
-(`build:packages && changeset publish`), which publishes whatever versions are not yet on npm and
-pushes the git tags.
-
-Two mechanisms do work at pack time, so what you publish is not what sits in the repo:
-
-- `publishConfig.exports` in `core` swaps the source-resolved `exports` for compiled `dist`.
-  Consumers never receive TypeScript.
-- `workspace:^` and `catalog:` are replaced with real semver ranges.
-
-Verify either with `pnpm pack` in the package directory and reading the `package.json` inside the
-tarball — that is exactly what npm would receive.
-
-### First release only
-
-The scoped packages have never been published, so this run needs a few things the steady
-state does not:
-
-1. **npm auth.** `.github/workflows/publish.yml` sets `id-token: write` and a `publish`
-   environment but passes no `NODE_AUTH_TOKEN`, which means it is set up for npm
-   [trusted publishing](https://docs.npmjs.com/trusted-publishers) rather than a token. Trusted
-   publishing is configured **per package on npmjs.com and the package has to exist first**, so
-   either publish each package once by hand, or add an `NPM_TOKEN` secret and
-   `NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}` to that step for the first run.
-2. **Scope access.** `"access": "public"` is already set in the changesets config, which is what
-   keeps scoped packages from defaulting to private.
-3. **The deprecated shim is not published by CI.** `editable-kit` is in the changesets `ignore`
-   list, and `ignore` skips publishing, not just versioning. Publish it once by hand, after
-   `@editable-kit/svelte` is on npm so its `workspace:^` range resolves to a real version:
-
-   ```bash
-   pnpm --filter editable-kit publish --access public
-   npm deprecate editable-kit "renamed to @editable-kit/svelte"
-   ```
-
-   It stays at 1.0.0 and depends on `@editable-kit/svelte@^1.0.0`, so it keeps working across the
-   whole 1.x line without being republished. It will not follow a 2.0 — retire it then.
-
-## Commands (run from repo root)
-
-- `pnpm dev` — run the docs/demo app (from `packages/svelte`)
-- `pnpm build` — build every package (topological)
-- `pnpm build:site` — build the static docs site (what GitHub Pages deploys)
-- `pnpm package` — package the Svelte library only
-- `pnpm check` — type-check every package and example
-- `pnpm test` — run every package's tests
-- `pnpm lint` / `pnpm format` — oxlint + oxfmt across the workspace
-
-`core` resolves to TypeScript source inside the workspace, so editing it hot-reloads into
-`pnpm dev` with no build step; `publishConfig.exports` swaps in compiled `dist` when pnpm packs, so
-consumers never receive TypeScript. Apps consuming it from the workspace need `ssr.noExternal` and
-`server.fs.allow` in their Vite config — see the examples.
-
-Package manager is **pnpm**. Every `@tiptap/*` version is pinned once in the `catalog:` block of
-`pnpm-workspace.yaml` — a split peer resolution gives you two copies of `@tiptap/core`, and TipTap's
-command augmentations only land on one of them.
-
-See `packages/svelte/README.md` for library usage.
+[MIT](LICENSE)
